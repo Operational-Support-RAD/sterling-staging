@@ -272,6 +272,9 @@ body.is-dragging{user-select:none;-webkit-user-select:none;cursor:grabbing}
 .ghead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:nowrap;margin-bottom:10px}
 .ghead>.c1{flex:1 1 0;min-width:0}
 .ghead>.row{flex:none;align-self:center}
+.envpill{display:inline-block;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:3px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.envpill[data-env=staging]{background:var(--warn-bg);border-color:var(--warn-fill);color:var(--warn)}
+.envpill[data-env=production]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
 .savest{display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:12.5px;color:var(--muted);background:transparent;border:1px solid var(--line);border-radius:999px;padding:3px 10px;cursor:default}
 .savest::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--good)}
 .savest[data-s=saving]::before{background:var(--muted);animation:svp 1s ease-in-out infinite}
@@ -509,7 +512,7 @@ body.notlead .qsel{pointer-events:none;appearance:none;-webkit-appearance:none;b
 <div class="app">
   <header class="top">
     <div class="brand" role="img" aria-label="Sterling">S<svg aria-hidden="true" focusable="false" viewBox="0 0 70 80"><path d="M 27 6.5 V 52 C 27 67 36 73.5 48 73.5 C 57 73.5 62 69 63.5 62" stroke-width="13"/><path d="M 5 6.5 H 65" stroke-width="13"/><path d="M 3 34.5 H 55" stroke-width="13" stroke-dasharray="10.5 3.5"/></svg>erling<span class="dot"></span></div>
-    <div class="who"><button type="button" class="savest" id="savest" data-act="saveNow" data-s="saved" aria-live="polite">Saved</button> <label for="who">Viewing as <select id="who" data-chg="user"></select></label> <button type="button" id="whoami" class="whoami" data-act="openProfile" aria-label="Your details"></button> <button type="button" class="btn small quiet" data-act="signOut">Sign out</button></div>
+    <div class="who"><span class="envpill" id="envpill" hidden></span> <button type="button" class="savest" id="savest" data-act="saveNow" data-s="saved" aria-live="polite">Saved</button> <label for="who">Viewing as <select id="who" data-chg="user"></select></label> <button type="button" id="whoami" class="whoami" data-act="openProfile" aria-label="Your details"></button> <button type="button" class="btn small quiet" data-act="signOut">Sign out</button></div>
   </header>
   <p class="demo">Demo data, stored only in this browser. Switch the person to see their view.</p>
   <nav class="tabs" id="tabs" aria-label="Sections"></nav>
@@ -1595,7 +1598,7 @@ function flashChk(li){
 document.addEventListener('click', function(e){
   if (Date.now() - (window.__dragEnd || 0) < 350) { e.stopPropagation(); return; }
   const pp = $('#pop');
-  if (pp && !pp.hidden && !e.target.closest('#pop') && !e.target.closest('[data-act="planPop"]') && !e.target.closest('[data-act="datePop"]') && !e.target.closest('[data-act="krPop"]')) closePop();
+  if (pp && !pp.hidden && !$('#kpick') && Date.now() - (window.__kpAt || 0) > 400 && !e.target.closest('#pop') && !e.target.closest('[data-act="planPop"]') && !e.target.closest('[data-act="datePop"]') && !e.target.closest('[data-act="krPop"]')) closePop();
   if (e.target.id === 'modal') { acts.closeModal(); return; }
   const b = e.target.closest('[data-act]'); if (!b) return;
   const fn = acts[b.dataset.act]; if (fn) fn(b, e);
@@ -3186,7 +3189,7 @@ function openKrPicker(sel){
   const w = document.createElement('div'); w.id = 'kpick'; w.className = 'kpick';
   w.innerHTML = '<div class="kpbox" role="dialog" aria-label="Choose a key result"><input class="kpsearch" id="kp-q" placeholder="Search key results" autocomplete="off"><div class="kplist">' + html + '</div></div>';
   document.body.appendChild(w);
-  window.__kpSel = sel;
+  window.__kpSel = sel; window.__kpAt = Date.now();
   const q = $('#kp-q'); if (q) q.focus();
 }
 document.addEventListener('mousedown', function(e){
@@ -3393,6 +3396,11 @@ Object.assign(forms, {
 /* ---------- cloud mode (Supabase) ---------- */
 const CFG = window.STERLING_CONFIG || null;
 const CLOUD = !!CFG;
+(function(){
+  const el = document.getElementById('envpill'); if (!el || !CLOUD) return;
+  const env = String(CFG.env || (/staging/i.test(location.pathname + location.hostname) ? 'staging' : 'production')).toLowerCase();
+  el.dataset.env = env === 'staging' ? 'staging' : 'production'; el.textContent = env === 'staging' ? 'Staging' : 'Production'; el.hidden = false;
+})();
 let SB = null;
 const cloud = {uid: null, team: null, synced: {}, meta: {}, busy: false, dirty: false, timer: null, orderSig: '', loaded: false};
 const LOCAL_KEY = 'sterling-local';
@@ -3823,4 +3831,3 @@ applyTheme();
 if (CLOUD) { document.body.classList.add('cloudmode'); startCloud(); } else { render(); showAuth(); }
 })();
 </script>
-
