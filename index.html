@@ -189,6 +189,11 @@ a{color:var(--ink)}
 .seg span{display:inline-block;padding:6px 12px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--muted)}
 .seg input:checked+span{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .seg input:focus-visible+span{outline:2px solid var(--ink);outline-offset:2px}
+input.tgl[type="checkbox"]{width:38px;height:22px;border-radius:999px;border:0;background:var(--line);position:relative;display:block;transition:background .15s}
+input.tgl[type="checkbox"]::after{content:"";display:block;position:absolute;top:3px;left:3px;width:16px;height:16px;border:0;border-radius:50%;background:var(--surface);transform:none;transition:transform .15s}
+input.tgl[type="checkbox"]:checked{background:var(--ink);border:0}
+input.tgl[type="checkbox"]:checked::after{display:block;transform:translateX(16px)}
+.subwho{margin:14px 0 2px;font-size:13px;font-weight:600;color:var(--muted)}
 .segb{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
 .segb button{background:var(--surface);color:var(--muted);border:0;padding:6px 12px;cursor:pointer}
 .segb button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
@@ -2104,9 +2109,30 @@ function nlBlock(kind, o){
     '<form data-form="addLink" data-kind="' + kind + '" data-id="' + o.id + '" class="row" style="margin-top:8px"><input id="ll-' + o.id + '" placeholder="Label (optional)" maxlength="60" style="flex:1 1 120px">' +
     '<input id="lu-' + o.id + '" placeholder="Link or text" maxlength="300" style="flex:2 1 200px"><button class="btn small" type="submit">Add</button></form></div>';
 }
+/* Task visibility: a team lead can allow members to hide teammates' tasks (everywhere except the Team tab). */
+function visAllowed(){
+  if (!CLOUD) { const v = S.settings.allowVis; return !!(v && v.on); }
+  let best = null;
+  S.users.forEach(function(u){
+    if (u.role !== 'Team lead') return;
+    const st = u.id === S.me ? S.settings : (((cloud.prefRaw || {})[u.id] || {}).settings);
+    const v = st && st.allowVis; if (v && (!best || (v.at || 0) > (best.at || 0))) best = v;
+  });
+  return !!(best && best.on);
+}
+const myHide = () => ((S.settings.hideFrom || {})[S.me]) || [];
+function hiddenOwner(owner){ return !!owner && owner !== S.me && !isLead() && visAllowed() && myHide().indexOf(owner) >= 0; }
+function subGroups(all){
+  const sorted = sortTasks(all.filter(t => !t.done), 'priority').concat(all.filter(t => t.done));
+  if (!visAllowed()) return '<ul class="tasks big" data-sublist>' + sorted.map(subTask).join('') + '</ul>';
+  const block = (title, ts) => ts.length ? (title ? '<h4 class="subwho">' + esc(title) + '</h4>' : '') + '<ul class="tasks big" data-sublist>' + ts.map(subTask).join('') + '</ul>' : '';
+  let out = block('', sorted.filter(t => t.owner === S.me));
+  S.users.forEach(function(u){ if (u.id !== S.me) out += block(u.name, sorted.filter(t => t.owner === u.id)); });
+  out += block('Unassigned', sorted.filter(t => !t.owner));
+  return out;
+}
 function linkedTasks(k){
-  const others = S.settings.onlyMine ? false : true;
-  return liveTasks().filter(t => t.krId === k.id && (t.owner === S.me || (others && t.scope === 'team')))
+  return liveTasks().filter(t => t.krId === k.id && (t.owner === S.me || (t.scope === 'team' && !hiddenOwner(t.owner))))
     .sort((a, b) => (a.order || 0) - (b.order || 0));
 }
 function krProgress(k){ const ts = linkedTasks(k); return {n: ts.length, done: ts.filter(t => t.done).length}; }
@@ -2135,11 +2161,11 @@ function krRow(k, o){
     progBar(krProgress(k)) + '<span class="stw">' + stSelect('kr', k.id, k.status, 'Status of ' + k.title) + '</span><span class="kact"><button type="button" class="pencil" data-act="renameKr" data-id="' + k.id + '" aria-label="Rename key result">' + ICO_PENCIL + '</button><button type="button" class="trashbtn" data-act="delKr" data-id="' + k.id + '" aria-label="Delete key result">' + ICO_TRASH + '</button></span></div></div>';
 }
 function krDetail(k){
-  const all = linkedTasks(k), act = sortTasks(all.filter(t => !t.done), 'priority'), dn = all.filter(t => t.done);
+  const all = linkedTasks(k);
   const open = !!(ui.kpd && ui.kpd[k.id]);
   return '<div class="krbody">' +
     '<div><h3 style="margin-top:0">Sub-items</h3>' +
-    (all.length ? '<ul class="tasks big" data-sublist>' + act.concat(dn).map(subTask).join('') + '</ul>' : '<p class="empty">No tasks yet.</p>') +
+    (all.length ? subGroups(all) : '<p class="empty">No tasks yet.</p>') +
     '<form data-form="addSub" data-id="' + k.id + '" class="qbar dull" novalidate><input id="sub-' + k.id + '" placeholder="+ Add sub-item" maxlength="140" autocomplete="off" aria-label="New sub-item" style="width:100%;box-sizing:border-box;font-size:15px"></form>' +
     revKrHtml(k) + '</div></div>';
 }
@@ -2785,17 +2811,16 @@ views.settings = function(){
   const ch = S.changes.slice(0, 15), tr = trashItems(), st = ptoStats(me());
   const my = '<div class="sgrid">' +
     '<section class="card side">' + scopeHead('Appearance', 'Only you') + '<div class="frm"><label class="fld">Theme<select id="s-theme" data-chg="theme">' + [['auto', 'Match device'], ['light', 'Light'], ['dark', 'Dark']].map(o => '<option value="' + o[0] + '"' + (S.theme === o[0] ? ' selected' : '') + '>' + o[1] + '</option>').join('') + '</select></label>' +
-    '<label class="fld">Tasks under goals<select id="s-mine" data-chg="onlyMine"><option value="all"' + (S.settings.onlyMine ? '' : ' selected') + '>Show tasks from other people</option><option value="mine"' + (S.settings.onlyMine ? ' selected' : '') + '>Show only my tasks</option></select></label>' +
     '<label class="fld">Week view<select id="s-week" data-chg="weekMode"><option value="work"' + (S.settings.fullWeek ? '' : ' selected') + '>Workdays (Mon to Fri)</option><option value="full"' + (S.settings.fullWeek ? ' selected' : '') + '>Full week (Mon to Sun)</option></select></label>' +
     '<label class="fld">Accent color (default is gray)<select id="s-acc" data-chg="accent">' + ACCENTS.map(a => '<option value="' + a + '"' + (S.accent === a ? ' selected' : '') + '>' + a[0].toUpperCase() + a.slice(1) + '</option>').join('') + '</select></label></div></section>' +
-    importCard() +
+    importCard() + visCard() +
     '<section class="card side">' + scopeHead('Your data', 'Only you') + '<p class="muted" style="margin:0 0 10px">Export your own tasks, reflections and goals. In the real version the team also gets a daily encrypted backup.</p>' +
     '<div class="row"><button class="btn" data-act="exportJson">Copy as JSON</button><button class="btn" data-act="exportCsv">Copy tasks as CSV</button>' + (CLOUD && isLead() ? '<button class="btn" data-act="teamBackup">Download team backup</button>' : '') + (CLOUD && isLead() && window.__env === 'staging' ? '<button class="btn" data-act="impBackup">Import production backup</button>' : '') + '</div></section>' + '</div>';
 
   const trashCard = '<section class="card side trashcard" style="margin-top:28px">' + scopeHead('Trash', 'Only you') + '<div class="row between" style="flex-wrap:nowrap;gap:12px"><span class="muted" style="font-size:13.5px">' + (tr.length ? tr.length + (tr.length === 1 ? ' deleted item' : ' deleted items') + ' kept for 30 days. You can restore them.' : 'Nothing deleted. Deleted items stay here for 30 days.') + '</span><button type="button" class="btn" data-act="openTrash">Open</button></div></section>';
   const codeCard = isLead() ? '<section class="card side" style="margin-bottom:6px"><div class="row between" style="flex-wrap:nowrap;gap:12px"><span><strong style="font-size:16px">Team invite code</strong><span class="muted" style="display:block;font-size:13px">New people enter this when they create an account. They join as members.</span><code class="invcode">' + esc(S.teamCode) + '</code></span><span class="row" style="flex-wrap:nowrap;gap:6px"><button type="button" class="btn small" data-act="copyCode">Copy</button><button type="button" class="btn small quiet" data-act="newCode">New code</button></span></div></section>' : '';
   return '<h2 class="sect" style="margin-top:8px">My settings</h2><p class="muted sectsub">Only you see and change these.</p>' + my +
-    (isLead() ? '<h2 class="sect">Team</h2><p class="muted sectsub">Only team leads see this. People appear here after they create an account with your invite code.</p>' + codeCard + teamCard() : '') +
+    (isLead() ? '<h2 class="sect">Team</h2><p class="muted sectsub">Only team leads see this. People appear here after they create an account with your invite code.</p>' + codeCard + teamCard() + allowCard() : '') +
     (CLOUD ? '' : '<h2 class="sect">This browser</h2><section class="card side">' + scopeHead('Demo', 'This browser only') + '<p class="muted" style="margin:0 0 10px">Brings back the original sample team and data.</p>' +
     (ui.confirmReset ? '<div class="row"><span>Reset everything?</span><button class="btn small primary" data-act="resetYes">Yes, reset</button><button class="btn small" data-act="resetNo">Cancel</button></div>' : '<button class="btn" data-act="resetAsk">Reset demo data</button>') + '</section>') + trashCard;
 };
@@ -2855,6 +2880,11 @@ Object.assign(acts, {
       toast('Backup downloaded.');
     } catch(e) { toast('Backup failed: ' + (e.message || e)); }
   },
+  allowVis: function(b){
+    if (!isLead()) return;
+    S.settings.allowVis = {on: b.dataset.v === 'on', at: Date.now()}; save(); render();
+    toast(b.dataset.v === 'on' ? 'Team members can now choose whose tasks they see.' : 'Everyone sees all tasks again.');
+  },
   impBackup: function(){
     const f = document.createElement('input'); f.type = 'file'; f.accept = '.json,application/json';
     f.onchange = async function(){
@@ -2898,7 +2928,13 @@ Object.assign(acts, {
 Object.assign(chg, {
   theme: function(el){ S.theme = el.value; save(); applyTheme(); },
   accent: function(el){ S.accent = el.value; save(); applyTheme(); },
-  onlyMine: function(el){ S.settings.onlyMine = el.value === 'mine'; save(); render(); },
+  hideFrom: function(el){
+    if (isLead() || !el.dataset.id) return;
+    S.settings.hideFrom = S.settings.hideFrom || {};
+    const cur = (S.settings.hideFrom[S.me] || []).filter(x => x !== el.dataset.id);
+    if (!el.checked) cur.push(el.dataset.id);
+    S.settings.hideFrom[S.me] = cur; save(); render();
+  },
   weekMode: function(el){ S.settings.fullWeek = el.value === 'full'; save(); render(); },
   fcCat: function(el){ S.settings.forecastName = el.value; save(); }
 });
@@ -3436,7 +3472,7 @@ const BUILDS = [
   {n: '1.0.0', date: '2026-10-28', title: 'First numbered build', items: [
     'Backlog lists: keep tasks in lists, split a list into sections, view it as a list or a board, drag tasks between sections and reorder the sections. Deleting a list sends its open tasks to Need review.',
     'Goals: picking a goal from the Goal button on a task now saves. Goals and key results show a long name before the pencil and bin.',
-    'New setting "Tasks under goals": show tasks from other people or only your own.',
+    'Task visibility: team leads can allow members to switch off tasks from chosen teammates (Settings, Team). Members then pick people with toggles, and Goals group tasks by person with your own first. The Team tab always shows everyone.',
     'Select several tasks and plan, set a deadline, priority or goal for all of them at once, or delete them.',
     'Move tasks between days in the week and month views. The week view can show Monday to Sunday.',
     'Reset a forgotten password by email. Sign-up asks for the password twice.',
@@ -3846,6 +3882,20 @@ chg.setRole = function(el){
 };
 const POSITIONS = ['Junior', 'Middle', 'Senior'];
 const posOf = u => u.position != null ? u.position : (u.level || (u.role !== 'Team lead' && u.role !== 'Member' ? u.role : ''));
+function allowCard(){
+  const on = visAllowed();
+  return '<section class="card side" id="allow-card">' + scopeHead('Allow team to manage task visibility', 'Team leads only') +
+    '<p class="muted" style="margin:0 0 10px">When allowed, each team member can switch off tasks from chosen teammates in their own view, everywhere except the Team tab. Goals then group tasks by person, with your own first. When not allowed, everyone sees all tasks.</p>' +
+    '<div class="segb" role="group" aria-label="Allow team to manage task visibility"><button type="button" data-act="allowVis" data-v="off" aria-pressed="' + !on + '">Not allowed</button><button type="button" data-act="allowVis" data-v="on" aria-pressed="' + on + '">Allowed</button></div>' +
+    '<p class="muted" style="margin:10px 0 0;font-size:13px">Current choice: <b>' + (on ? 'Allowed' : 'Not allowed') + '</b>.</p></section>';
+}
+function visCard(){
+  if (isLead() || !visAllowed()) return '';
+  const others = S.users.filter(u => u.id !== S.me), hid = myHide();
+  return '<section class="card side" id="vis-card">' + scopeHead('Tasks from teammates', 'Only you') +
+    '<p class="muted" style="margin:0 0 6px">Switch a person off to stop seeing their tasks under goals. The Team tab still shows everyone.</p>' +
+    (others.length ? others.map(u => '<label class="trow"><span style="min-width:0"><b>' + esc(u.name) + '</b></span><input type="checkbox" class="tgl" data-chg="hideFrom" data-id="' + u.id + '"' + (hid.indexOf(u.id) < 0 ? ' checked' : '') + ' aria-label="Show tasks from ' + esc(u.name) + '"></label>').join('') : '<p class="empty">No teammates yet.</p>') + '</section>';
+}
 function teamCard(){
   const rows = S.users.map(function(u){
     const lead = u.role === 'Team lead', pos = posOf(u);
