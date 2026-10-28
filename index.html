@@ -2105,7 +2105,8 @@ function nlBlock(kind, o){
     '<input id="lu-' + o.id + '" placeholder="Link or text" maxlength="300" style="flex:2 1 200px"><button class="btn small" type="submit">Add</button></form></div>';
 }
 function linkedTasks(k){
-  return liveTasks().filter(t => t.krId === k.id && (t.owner === S.me || t.scope === 'team'))
+  const others = S.settings.onlyMine ? false : true;
+  return liveTasks().filter(t => t.krId === k.id && (t.owner === S.me || (others && t.scope === 'team')))
     .sort((a, b) => (a.order || 0) - (b.order || 0));
 }
 function krProgress(k){ const ts = linkedTasks(k); return {n: ts.length, done: ts.filter(t => t.done).length}; }
@@ -2784,6 +2785,7 @@ views.settings = function(){
   const ch = S.changes.slice(0, 15), tr = trashItems(), st = ptoStats(me());
   const my = '<div class="sgrid">' +
     '<section class="card side">' + scopeHead('Appearance', 'Only you') + '<div class="frm"><label class="fld">Theme<select id="s-theme" data-chg="theme">' + [['auto', 'Match device'], ['light', 'Light'], ['dark', 'Dark']].map(o => '<option value="' + o[0] + '"' + (S.theme === o[0] ? ' selected' : '') + '>' + o[1] + '</option>').join('') + '</select></label>' +
+    '<label class="fld">Tasks under goals<select id="s-mine" data-chg="onlyMine"><option value="all"' + (S.settings.onlyMine ? '' : ' selected') + '>Show tasks from other people</option><option value="mine"' + (S.settings.onlyMine ? ' selected' : '') + '>Show only my tasks</option></select></label>' +
     '<label class="fld">Week view<select id="s-week" data-chg="weekMode"><option value="work"' + (S.settings.fullWeek ? '' : ' selected') + '>Workdays (Mon to Fri)</option><option value="full"' + (S.settings.fullWeek ? ' selected' : '') + '>Full week (Mon to Sun)</option></select></label>' +
     '<label class="fld">Accent color (default is gray)<select id="s-acc" data-chg="accent">' + ACCENTS.map(a => '<option value="' + a + '"' + (S.accent === a ? ' selected' : '') + '>' + a[0].toUpperCase() + a.slice(1) + '</option>').join('') + '</select></label></div></section>' +
     importCard() +
@@ -2896,6 +2898,7 @@ Object.assign(acts, {
 Object.assign(chg, {
   theme: function(el){ S.theme = el.value; save(); applyTheme(); },
   accent: function(el){ S.accent = el.value; save(); applyTheme(); },
+  onlyMine: function(el){ S.settings.onlyMine = el.value === 'mine'; save(); render(); },
   weekMode: function(el){ S.settings.fullWeek = el.value === 'full'; save(); render(); },
   fcCat: function(el){ S.settings.forecastName = el.value; save(); }
 });
