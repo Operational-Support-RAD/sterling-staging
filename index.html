@@ -1859,31 +1859,45 @@ Object.assign(acts, {
   }
 });
 Object.assign(forms, {
-  tdGo: function(f){
+  tdGo: async function(f){
     const plan = ui.td, name = $('#td-name', f).value.trim(); if (!plan) return; if (!name) { toast('Add a list name first.'); return; }
-    let l = myLists().find(x => x.name.toLowerCase() === name.toLowerCase());
-    if (!l) { l = {id: uid(), owner: S.me, name: name, secs: []}; S.lists.push(l); }
-    l.secs = l.secs || [];
-    const secId = {}, who = {};
-    plan.secs.forEach(function(n, i){ const m = $('#td-m-' + i, f); if (m && m.value && user(m.value)) who[n] = m.value; });
-    plan.secs.forEach(function(n){ if (who[n] && who[n] !== S.me) return; let x = l.secs.find(y => y.name.toLowerCase() === n.toLowerCase()); if (!x) { x = {id: uid(), name: n}; l.secs.push(x); } secId[n] = x.id; });
+    if (ui.tdBusy) return;
+    const who = {};
+    plan.secs.forEach(function(n, i){ const m = $('#td-m-' + i, f); if (m && m.value && user(m.value) && m.value !== S.me) who[n] = m.value; });
+    const L = myLists().find(x => x.name.toLowerCase() === name.toLowerCase());
+    const l = L || {id: uid(), owner: S.me, name: name, secs: []};
+    const newSecs = [], secId = {};
+    plan.secs.forEach(function(n){
+      if (who[n]) return;
+      let x = (l.secs || []).find(y => y.name.toLowerCase() === n.toLowerCase()) || newSecs.find(y => y.name.toLowerCase() === n.toLowerCase());
+      if (!x) { x = {id: uid(), name: n}; newSecs.push(x); }
+      secId[n] = x.id;
+    });
     const have = {}; S.tasks.forEach(function(x){ if (x.owner === S.me && x.listId === l.id && !x.deleted) have[x.title + '|' + (x.secId || '')] = 1; });
-    let skipped = 0; const sent = {};
+    let skipped = 0; const sent = {}, out = [], mine = [];
     plan.tasks.forEach(function(t){
-      const o = who[t.sec];
-      if (o && o !== S.me) {
-        if (S.tasks.some(x => !x.deleted && x.owner === o && x.createdBy === S.me && x.title === t.title.slice(0, 140))) { skipped++; return; }
-        createTask({title: t.title.slice(0, 140), desc: t.desc, priority: t.priority, date: t.date, deadline: t.deadline, krId: null, needReview: true, owner: o,
-          subs: t.subs.map(x => ({id: uid(), title: x.slice(0, 140), done: false}))}, '');
+      const title = t.title.slice(0, 140), subs = t.subs.map(x => ({id: uid(), title: x.slice(0, 140), done: false})), o = who[t.sec];
+      if (o) {
+        if (S.tasks.some(x => !x.deleted && x.owner === o && x.createdBy === S.me && x.title === title)) { skipped++; return; }
+        out.push(newTask({title: title, desc: t.desc, priority: t.priority, date: t.date, deadline: t.deadline, krId: null, needReview: true, owner: o, createdBy: S.me, subs: subs}));
         sent[o] = (sent[o] || 0) + 1; return;
       }
-      if (have[t.title.slice(0, 140) + '|' + (t.sec && secId[t.sec] ? secId[t.sec] : '')]) { skipped++; return; }
-      createTask({title: t.title.slice(0, 140), desc: t.desc, priority: t.priority, date: t.date, deadline: t.deadline, krId: null, needReview: true, listId: l.id, secId: t.sec && secId[t.sec] ? secId[t.sec] : null,
-        subs: t.subs.map(x => ({id: uid(), title: x.slice(0, 140), done: false}))}, '');
+      const sid = t.sec && secId[t.sec] ? secId[t.sec] : null;
+      if (have[title + '|' + (sid || '')]) { skipped++; return; }
+      mine.push({title: title, desc: t.desc, priority: t.priority, date: t.date, deadline: t.deadline, krId: null, needReview: true, listId: l.id, secId: sid, subs: subs});
     });
-    ui.td = null; ui.blList = l.id; closeModal(); S.view = 'review'; save(); render();
+    if (out.length && CLOUD && SB) {
+      ui.tdBusy = true;
+      let r; try { r = await SB.rpc('send_tasks', {p_rows: out.map(t => ({id: t.id, owner_id: t.owner, data: t}))}); } catch (e) { r = {error: e}; }
+      ui.tdBusy = false;
+      if (r.error) { toast('Could not send tasks to the team, nothing was imported. ' + (r.error.message || r.error)); return; }
+    } else out.forEach(t => S.tasks.push(t));
+    if (!L && (mine.length || newSecs.length)) S.lists.push(l);
+    l.secs = (l.secs || []).concat(newSecs);
+    mine.forEach(o => createTask(o, ''));
+    ui.td = null; ui.blList = mine.length ? l.id : ui.blList; closeModal(); S.view = 'review'; save(); render();
     const n = plan.tasks.length - skipped, sn = Object.keys(sent).map(id => sent[id] + ' to ' + user(id).name);
-    toast(n + (n === 1 ? ' task' : ' tasks') + ' imported into "' + l.name + '".' + (skipped ? ' ' + skipped + ' already there, skipped.' : sn.length ? ' ' + sn.join(', ') + '.' : ' Give each one a goal and it moves into the list.'));
+    toast(n + (n === 1 ? ' task' : ' tasks') + ' imported' + (mine.length ? ' into "' + l.name + '"' : '') + '.' + (skipped ? ' ' + skipped + ' already there, skipped.' : '') + (sn.length ? ' ' + sn.join(', ') + '.' : mine.length ? ' Give each one a goal and it moves into the list.' : ''));
   }
 });
 function importCard(){
