@@ -306,6 +306,7 @@ body.is-dragging{user-select:none;-webkit-user-select:none;cursor:grabbing}
 .ghead>.c1{flex:1 1 0;min-width:0}
 .ghead>.row{flex:none;align-self:center}
 .envpill{font-family:inherit;cursor:pointer;display:inline-block;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:3.4px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.authbox .envpill.auth{align-self:flex-start;margin-top:-14px;cursor:default}
 .envpill .envb{font-weight:500;letter-spacing:.04em;opacity:.55;margin-left:6px}
 .envpill[data-env=staging]{background:var(--warn-bg);border-color:var(--warn-fill);color:var(--warn)}
 .envpill[data-env=production]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
@@ -3769,6 +3770,10 @@ Object.assign(acts, { openBuild: function(){ openModal(buildHtml()); $('#modal')
   el.dataset.env = window.__env = env === 'staging' ? 'staging' : env === 'demo' ? 'demo' : 'production';
   el.innerHTML = '<span class="envn">' + (env === 'staging' ? 'Staging' : env === 'demo' ? 'Demo' : 'Production') + '</span><span class="envb">' + BUILD + '</span>'; el.setAttribute('aria-label', 'Build ' + BUILD + '. What is new in this build'); el.hidden = false;
 })();
+function envChip(){
+  const e = window.__env || 'demo';
+  return '<span class="envpill auth" data-env="' + e + '"><span class="envn">' + (e === 'staging' ? 'Staging' : e === 'demo' ? 'Demo' : 'Production') + '</span><span class="envb">' + BUILD + '</span></span>';
+}
 let SB = null;
 const cloud = {uid: null, team: null, synced: {}, meta: {}, busy: false, dirty: false, timer: null, orderSig: '', loaded: false};
 const LOCAL_KEY = 'sterling-local';
@@ -3999,15 +4004,15 @@ const emailOf = u => (u.email || (u.name.toLowerCase() + '@demo.team'));
 ui.authTab = 'in'; ui.authErr = '';
 function authHtml(){
   const inTab = ui.authTab === 'in';
-  if (ui.authTab === 'reset') return '<div class="authbox"><div class="brand" role="img" aria-label="Sterling">S' + $('.brand svg').outerHTML + 'erling<span class="dot"></span></div><p class="tag">Quality, scheduled.</p><div class="authcard"><h2 style="margin:0 0 6px;font-size:17px">Reset your password</h2>' +
+  if (ui.authTab === 'reset') return '<div class="authbox"><div class="brand" role="img" aria-label="Sterling">S' + $('.brand svg').outerHTML + 'erling<span class="dot"></span></div><p class="tag">Quality, scheduled.</p>' + envChip() + '<div class="authcard"><h2 style="margin:0 0 6px;font-size:17px">Reset your password</h2>' +
     '<form class="frm" data-form="resetPw" novalidate><label class="fld">Email<input id="au-e" type="email" autocomplete="username" placeholder="you@company.com"></label>' +
     (ui.authErr ? '<p class="autherr" role="alert">' + esc(ui.authErr) + '</p>' : '') + (ui.authInfo ? '<p class="authok" role="status">' + esc(ui.authInfo) + '</p>' : '') +
     '<button class="btn primary" type="submit">Send reset link</button><button type="button" class="linklike muted" data-act="authTab" data-tab="in" style="justify-self:start;font-size:13px">Back to sign in</button></form></div></div>';
-  if (ui.authTab === 'newpw') return '<div class="authbox"><div class="brand" role="img" aria-label="Sterling">S' + $('.brand svg').outerHTML + 'erling<span class="dot"></span></div><p class="tag">Quality, scheduled.</p><div class="authcard"><h2 style="margin:0 0 6px;font-size:17px">Choose a new password</h2>' +
+  if (ui.authTab === 'newpw') return '<div class="authbox"><div class="brand" role="img" aria-label="Sterling">S' + $('.brand svg').outerHTML + 'erling<span class="dot"></span></div><p class="tag">Quality, scheduled.</p>' + envChip() + '<div class="authcard"><h2 style="margin:0 0 6px;font-size:17px">Choose a new password</h2>' +
     '<form class="frm" data-form="newPw" novalidate><label class="fld">New password<input id="au-p" type="password" autocomplete="new-password" data-inp="pwMatch"></label>' +
     '<label class="fld">Repeat new password<input id="au-p2" type="password" autocomplete="new-password" data-inp="pwMatch"></label><p class="pwmatch" id="au-match" aria-live="polite"></p>' +
     (ui.authErr ? '<p class="autherr" role="alert">' + esc(ui.authErr) + '</p>' : '') + '<button class="btn primary" type="submit">Save password</button></form></div></div>';
-  return '<div class="authbox"><div class="brand" role="img" aria-label="Sterling">S' + $('.brand svg').outerHTML + 'erling<span class="dot"></span></div><p class="tag">Quality, scheduled.</p>' +
+  return '<div class="authbox"><div class="brand" role="img" aria-label="Sterling">S' + $('.brand svg').outerHTML + 'erling<span class="dot"></span></div><p class="tag">Quality, scheduled.</p>' + envChip() + '' +
     '<div class="authcard"><div class="authtabs" role="group"><button type="button" data-act="authTab" data-tab="in" aria-pressed="' + inTab + '">Sign in</button><button type="button" data-act="authTab" data-tab="up" aria-pressed="' + !inTab + '">Create account</button></div>' +
     (inTab ?
       '<form class="frm" data-form="signIn" novalidate><label class="fld">Email<input id="au-e" type="email" autocomplete="username" placeholder="you@company.com"></label>' +
