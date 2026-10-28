@@ -1770,7 +1770,7 @@ function todoistCard(){
     '<p class="muted" style="margin:0 0 10px">Bring a Todoist project over. Tasks land in Need review until you give them a goal.</p>' +
     '<div class="row" style="flex-wrap:nowrap;gap:8px;align-items:center"><button type="button" class="btn" data-act="tdPick">Import from Todoist</button>' +
     '<span class="helpwrap"><button type="button" class="helpq" aria-label="How to export from Todoist" aria-describedby="td-tip">?</button>' +
-    '<span class="tip" id="td-tip" role="tooltip"><b>How to export</b><br>1. In Todoist, open the project.<br>2. Click the three dots at the top right, then Export as CSV.<br>3. Click Import from Todoist here and choose the downloaded file.<br><br>The project becomes a list in your Backlog and its sections become sections of that list. Sub-tasks stay sub-tasks. Dates and deadlines come across. Recurring dates are kept as a note.</span></span></div></section>';
+    '<span class="tip" id="td-tip" role="tooltip"><b>How to export</b><br>1. In Todoist, open the project.<br>2. Click the three dots at the top right, then Export as CSV.<br>3. Click Import from Todoist here and choose the downloaded file.<br><br>Your own project: it becomes a list in your Backlog and its sections become sections of that list. Everything lands in Need review until you give a task a goal.<br><br>Shared project with sections named by person: in the import window, choose a team member next to each section. Their tasks go to the own Need review of that person. Sections left as Keep as section stay in your list. Import a shared file once, so tasks are not created twice.<br><br>Sub-tasks stay sub-tasks. Dates and deadlines come across. Recurring dates are kept as a note. Importing the same file again skips tasks that are already there.</span></span></div></section>';
 }
 const TD_MON = {jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6, jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12};
 function tdDate(raw){
@@ -1819,6 +1819,25 @@ function tdParse(text, fileName){
   const stem = String(fileName || '').replace(/\.[^.]+$/, '').replace(/\s*\(\d+\)$/, '');
   return {name: stem, secs: secs, tasks: tasks};
 }
+function tdGuess(sec){
+  const k = String(sec).toLowerCase().replace(/[^\p{L}\p{N}]/gu, ''); if (!k) return '';
+  const u = S.users.find(function(x){
+    if (x.id === S.me && false) return false;
+    const w = x.name.toLowerCase().split(/\s+/).filter(Boolean), ini = w.map(a => a[0]).join('');
+    return k === ini || k === w.join('') || k === w[0];
+  });
+  return u ? u.id : '';
+}
+function tdMapHtml(plan){
+  if (!plan.secs.length) return '';
+  const cnt = {}; plan.tasks.forEach(t => { if (t.sec) cnt[t.sec] = (cnt[t.sec] || 0) + 1; });
+  return '<p style="margin:14px 0 6px">Sections can go to people. Tasks for a person land in their own Need review.</p>' +
+    '<div class="scroll" style="max-height:220px"><table class="tbl"><tbody>' + plan.secs.map(function(n, i){
+      const g = tdGuess(n);
+      return '<tr><td>' + esc(n) + ' <span class="muted">(' + (cnt[n] || 0) + ')</span></td><td><select id="td-m-' + i + '" style="max-width:200px"><option value="">Keep as section</option>' +
+        S.users.map(u => '<option value="' + u.id + '"' + (u.id === g ? ' selected' : '') + '>' + esc(u.name) + (u.id === S.me ? ' (me)' : '') + '</option>').join('') + '</select></td></tr>';
+    }).join('') + '</tbody></table></div>';
+}
 Object.assign(acts, {
   tdPick: function(){
     const f = document.createElement('input'); f.type = 'file'; f.accept = '.csv,text/csv';
@@ -1832,7 +1851,7 @@ Object.assign(acts, {
       openModal('<h2>Import from Todoist</h2><form data-form="tdGo" novalidate>' +
         '<label class="fld" style="display:block">List name in Backlog<input id="td-name" value="' + esc(plan.name) + '" maxlength="60" autocomplete="off" style="width:100%;box-sizing:border-box;margin-top:4px"></label>' +
         '<p style="margin:10px 0 0">' + plan.tasks.length + (plan.tasks.length === 1 ? ' task' : ' tasks') + (subs ? ' with ' + subs + (subs === 1 ? ' sub-task' : ' sub-tasks') : '') + ', ' + plan.secs.length + (plan.secs.length === 1 ? ' section' : ' sections') + (dated ? ', ' + dated + ' with dates' : '') + '.</p>' +
-        '<p class="muted" style="margin:6px 0 0">All tasks go to Need review. Once you give a task a goal, it moves into this list.</p>' +
+        '<p class="muted" style="margin:6px 0 0">All tasks go to Need review. Once you give a task a goal, it moves into this list.</p>' + tdMapHtml(plan) +
         '<div class="actions"><button type="button" class="btn" data-act="closeModal">Cancel</button><button type="submit" class="btn primary">Import</button></div></form>');
       $('#modal').classList.add('center'); const i = $('#td-name'); if (i) { i.focus(); i.select(); }
     };
@@ -1845,18 +1864,26 @@ Object.assign(forms, {
     let l = myLists().find(x => x.name.toLowerCase() === name.toLowerCase());
     if (!l) { l = {id: uid(), owner: S.me, name: name, secs: []}; S.lists.push(l); }
     l.secs = l.secs || [];
-    const secId = {};
-    plan.secs.forEach(function(n){ let x = l.secs.find(y => y.name.toLowerCase() === n.toLowerCase()); if (!x) { x = {id: uid(), name: n}; l.secs.push(x); } secId[n] = x.id; });
+    const secId = {}, who = {};
+    plan.secs.forEach(function(n, i){ const m = $('#td-m-' + i, f); if (m && m.value && user(m.value)) who[n] = m.value; });
+    plan.secs.forEach(function(n){ if (who[n] && who[n] !== S.me) return; let x = l.secs.find(y => y.name.toLowerCase() === n.toLowerCase()); if (!x) { x = {id: uid(), name: n}; l.secs.push(x); } secId[n] = x.id; });
     const have = {}; S.tasks.forEach(function(x){ if (x.owner === S.me && x.listId === l.id && !x.deleted) have[x.title + '|' + (x.secId || '')] = 1; });
-    let skipped = 0;
+    let skipped = 0; const sent = {};
     plan.tasks.forEach(function(t){
-      if (have[t.title.slice(0, 140) + '|' + (t.sec ? secId[t.sec] : '')]) { skipped++; return; }
-      createTask({title: t.title.slice(0, 140), desc: t.desc, priority: t.priority, date: t.date, deadline: t.deadline, krId: null, needReview: true, listId: l.id, secId: t.sec ? secId[t.sec] : null,
+      const o = who[t.sec];
+      if (o && o !== S.me) {
+        if (S.tasks.some(x => !x.deleted && x.owner === o && x.createdBy === S.me && x.title === t.title.slice(0, 140))) { skipped++; return; }
+        createTask({title: t.title.slice(0, 140), desc: t.desc, priority: t.priority, date: t.date, deadline: t.deadline, krId: null, needReview: true, owner: o,
+          subs: t.subs.map(x => ({id: uid(), title: x.slice(0, 140), done: false}))}, '');
+        sent[o] = (sent[o] || 0) + 1; return;
+      }
+      if (have[t.title.slice(0, 140) + '|' + (t.sec && secId[t.sec] ? secId[t.sec] : '')]) { skipped++; return; }
+      createTask({title: t.title.slice(0, 140), desc: t.desc, priority: t.priority, date: t.date, deadline: t.deadline, krId: null, needReview: true, listId: l.id, secId: t.sec && secId[t.sec] ? secId[t.sec] : null,
         subs: t.subs.map(x => ({id: uid(), title: x.slice(0, 140), done: false}))}, '');
     });
     ui.td = null; ui.blList = l.id; closeModal(); S.view = 'review'; save(); render();
-    const n = plan.tasks.length - skipped;
-    toast(n + (n === 1 ? ' task' : ' tasks') + ' imported into "' + l.name + '".' + (skipped ? ' ' + skipped + ' already there, skipped.' : ' Give each one a goal and it moves into the list.'));
+    const n = plan.tasks.length - skipped, sn = Object.keys(sent).map(id => sent[id] + ' to ' + user(id).name);
+    toast(n + (n === 1 ? ' task' : ' tasks') + ' imported into "' + l.name + '".' + (skipped ? ' ' + skipped + ' already there, skipped.' : sn.length ? ' ' + sn.join(', ') + '.' : ' Give each one a goal and it moves into the list.'));
   }
 });
 function importCard(){
