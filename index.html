@@ -272,7 +272,7 @@ body.is-dragging{user-select:none;-webkit-user-select:none;cursor:grabbing}
 .ghead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:nowrap;margin-bottom:10px}
 .ghead>.c1{flex:1 1 0;min-width:0}
 .ghead>.row{flex:none;align-self:center}
-.envpill{display:inline-block;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:3px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.envpill{font-family:inherit;cursor:pointer;display:inline-block;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:3px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
 .envpill[data-env=staging]{background:var(--warn-bg);border-color:var(--warn-fill);color:var(--warn)}
 .envpill[data-env=production]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
 .savest{display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:12.5px;color:var(--muted);background:transparent;border:1px solid var(--line);border-radius:999px;padding:3px 10px;cursor:default}
@@ -512,7 +512,7 @@ body.notlead .qsel{pointer-events:none;appearance:none;-webkit-appearance:none;b
 <div class="app">
   <header class="top">
     <div class="brand" role="img" aria-label="Sterling">S<svg aria-hidden="true" focusable="false" viewBox="0 0 70 80"><path d="M 27 6.5 V 52 C 27 67 36 73.5 48 73.5 C 57 73.5 62 69 63.5 62" stroke-width="13"/><path d="M 5 6.5 H 65" stroke-width="13"/><path d="M 3 34.5 H 55" stroke-width="13" stroke-dasharray="10.5 3.5"/></svg>erling<span class="dot"></span></div>
-    <div class="who"><span class="envpill" id="envpill" hidden></span> <button type="button" class="savest" id="savest" data-act="saveNow" data-s="saved" aria-live="polite">Saved</button> <label for="who">Viewing as <select id="who" data-chg="user"></select></label> <button type="button" id="whoami" class="whoami" data-act="openProfile" aria-label="Your details"></button> <button type="button" class="btn small quiet" data-act="signOut">Sign out</button></div>
+    <div class="who"><button type="button" class="envpill" id="envpill" data-act="openBuild" aria-label="What is new in this build" hidden></button> <button type="button" class="savest" id="savest" data-act="saveNow" data-s="saved" aria-live="polite">Saved</button> <label for="who">Viewing as <select id="who" data-chg="user"></select></label> <button type="button" id="whoami" class="whoami" data-act="openProfile" aria-label="Your details"></button> <button type="button" class="btn small quiet" data-act="signOut">Sign out</button></div>
   </header>
   <p class="demo">Demo data, stored only in this browser. Switch the person to see their view.</p>
   <nav class="tabs" id="tabs" aria-label="Sections"></nav>
@@ -3430,10 +3430,35 @@ Object.assign(forms, {
 /* ---------- cloud mode (Supabase) ---------- */
 const CFG = window.STERLING_CONFIG || null;
 const CLOUD = !!CFG;
+/* Build number: changes only when the owner says so. Add the next build (for example 1.0.1 or 1.1.0) at the top of BUILDS and set BUILD to it. */
+const BUILD = '1.0.0';
+const BUILDS = [
+  {n: '1.0.0', date: '2026-10-28', title: 'First numbered build', items: [
+    'Backlog lists: keep tasks in lists, split a list into sections, view it as a list or a board, drag tasks between sections and reorder the sections. Deleting a list sends its open tasks to Need review.',
+    'Goals: picking a goal from the Goal button on a task now saves. Goals and key results show a long name before the pencil and bin.',
+    'New setting "Tasks under goals": show tasks from other people or only your own.',
+    'Select several tasks and plan, set a deadline, priority or goal for all of them at once, or delete them.',
+    'Move tasks between days in the week and month views. The week view can show Monday to Sunday.',
+    'Reset a forgotten password by email. Sign-up asks for the password twice.',
+    'Team leads manage roles in Settings, Team. Everyone can change their name and position under Your details.',
+    'A pill at the top shows whether data is saved. A second pill shows the environment and this build number.',
+    'Staging only: Import production backup in Settings.'
+  ]}
+];
+function buildHtml(){
+  const cur = BUILDS.find(b => b.n === BUILD) || BUILDS[0];
+  const list = b => '<ul style="margin:6px 0 0;padding-left:20px;display:grid;gap:6px">' + b.items.map(i => '<li>' + esc(i) + '</li>').join('') + '</ul>';
+  const older = BUILDS.filter(b => b.n !== cur.n);
+  return '<h2 style="margin:0">Build ' + cur.n + '</h2><p class="muted" style="margin:2px 0 10px">' + esc(cur.title) + ' · ' + esc(cur.date) + '</p>' + list(cur) +
+    (older.length ? '<h3 style="margin:16px 0 0;font-size:14px">Earlier builds</h3>' + older.map(b => '<div style="margin-top:8px"><b>Build ' + b.n + '</b> <span class="muted">' + esc(b.date) + '</span>' + list(b) + '</div>').join('') : '') +
+    '<div class="actions"><button type="button" class="btn primary" data-act="closeModal">Close</button></div>';
+}
+Object.assign(acts, { openBuild: function(){ openModal(buildHtml()); $('#modal').classList.add('center'); } });
 (function(){
-  const el = document.getElementById('envpill'); if (!el || !CLOUD) return;
-  const env = String(CFG.env || (/staging/i.test(location.pathname + location.hostname) ? 'staging' : 'production')).toLowerCase();
-  el.dataset.env = window.__env = env === 'staging' ? 'staging' : 'production'; el.textContent = env === 'staging' ? 'Staging' : 'Production'; el.hidden = false;
+  const el = document.getElementById('envpill'); if (!el) return;
+  const env = !CLOUD ? 'demo' : String(CFG.env || (/staging/i.test(location.pathname + location.hostname) ? 'staging' : 'production')).toLowerCase();
+  el.dataset.env = window.__env = env === 'staging' ? 'staging' : env === 'demo' ? 'demo' : 'production';
+  el.textContent = (env === 'staging' ? 'Staging' : env === 'demo' ? 'Demo' : 'Production') + ' · Build ' + BUILD; el.hidden = false;
 })();
 let SB = null;
 const cloud = {uid: null, team: null, synced: {}, meta: {}, busy: false, dirty: false, timer: null, orderSig: '', loaded: false};
