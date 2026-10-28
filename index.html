@@ -2788,7 +2788,7 @@ views.settings = function(){
     '<label class="fld">Accent color (default is gray)<select id="s-acc" data-chg="accent">' + ACCENTS.map(a => '<option value="' + a + '"' + (S.accent === a ? ' selected' : '') + '>' + a[0].toUpperCase() + a.slice(1) + '</option>').join('') + '</select></label></div></section>' +
     importCard() +
     '<section class="card side">' + scopeHead('Your data', 'Only you') + '<p class="muted" style="margin:0 0 10px">Export your own tasks, reflections and goals. In the real version the team also gets a daily encrypted backup.</p>' +
-    '<div class="row"><button class="btn" data-act="exportJson">Copy as JSON</button><button class="btn" data-act="exportCsv">Copy tasks as CSV</button>' + (CLOUD && isLead() ? '<button class="btn" data-act="teamBackup">Download team backup</button>' : '') + '</div></section>' + '</div>';
+    '<div class="row"><button class="btn" data-act="exportJson">Copy as JSON</button><button class="btn" data-act="exportCsv">Copy tasks as CSV</button>' + (CLOUD && isLead() ? '<button class="btn" data-act="teamBackup">Download team backup</button>' : '') + (CLOUD && isLead() && window.__env === 'staging' ? '<button class="btn" data-act="impBackup">Import production backup</button>' : '') + '</div></section>' + '</div>';
 
   const trashCard = '<section class="card side trashcard" style="margin-top:28px">' + scopeHead('Trash', 'Only you') + '<div class="row between" style="flex-wrap:nowrap;gap:12px"><span class="muted" style="font-size:13.5px">' + (tr.length ? tr.length + (tr.length === 1 ? ' deleted item' : ' deleted items') + ' kept for 30 days. You can restore them.' : 'Nothing deleted. Deleted items stay here for 30 days.') + '</span><button type="button" class="btn" data-act="openTrash">Open</button></div></section>';
   const codeCard = isLead() ? '<section class="card side" style="margin-bottom:6px"><div class="row between" style="flex-wrap:nowrap;gap:12px"><span><strong style="font-size:16px">Team invite code</strong><span class="muted" style="display:block;font-size:13px">New people enter this when they create an account. They join as members.</span><code class="invcode">' + esc(S.teamCode) + '</code></span><span class="row" style="flex-wrap:nowrap;gap:6px"><button type="button" class="btn small" data-act="copyCode">Copy</button><button type="button" class="btn small quiet" data-act="newCode">New code</button></span></div></section>' : '';
@@ -2852,6 +2852,37 @@ Object.assign(acts, {
       document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){ URL.revokeObjectURL(a.href); }, 2000);
       toast('Backup downloaded.');
     } catch(e) { toast('Backup failed: ' + (e.message || e)); }
+  },
+  impBackup: function(){
+    const f = document.createElement('input'); f.type = 'file'; f.accept = '.json,application/json';
+    f.onchange = async function(){
+      const file = f.files && f.files[0]; if (!file) return;
+      try {
+        const bk = JSON.parse(await file.text());
+        if (!bk || !Array.isArray(bk.people) || !Array.isArray(bk.items)) { toast('This is not a Sterling team backup.'); return; }
+        toast('Importing...');
+        const here = await fetchAll('profiles'), idByEmail = {}, map = {};
+        here.forEach(p => { idByEmail[String(p.email).toLowerCase()] = p.id; });
+        let missing = [];
+        bk.people.forEach(function(p){ const to = idByEmail[String(p.email).toLowerCase()]; if (to) map[p.id] = to; else missing.push(p.name || p.email); });
+        const fix = txt => Object.keys(map).reduce((a, from) => a.split(from).join(map[from]), txt);
+        const rows = [], skipped = {};
+        bk.items.forEach(function(it){
+          if (!map[it.owner_id]) { skipped[it.owner_id] = 1; return; }
+          const r = JSON.parse(fix(JSON.stringify({kind: it.kind, id: it.id, owner_id: it.owner_id, assignee_id: it.assignee_id || null, data: it.data || {}, deleted_at: it.deleted_at || null})));
+          rows.push(r);
+        });
+        let n = 0;
+        for (let i = 0; i < rows.length; i += 200) {
+          const r = await SB.rpc('import_items', {p_rows: rows.slice(i, i + 200)});
+          if (r.error) { toast('Import failed: ' + r.error.message); return; }
+          n += rows.slice(i, i + 200).length;
+        }
+        await refreshCloud();
+        toast(n + ' items imported.' + (missing.length ? ' Skipped people without a staging account: ' + missing.join(', ') + '.' : ''));
+      } catch(e) { toast('Import failed: ' + (e.message || e)); }
+    };
+    f.click();
   },
   exportJson: function(){ copyText(exportData('json'), 'JSON copied.'); },
   exportCsv: function(){ copyText(exportData('csv'), 'CSV copied.'); },
@@ -3399,7 +3430,7 @@ const CLOUD = !!CFG;
 (function(){
   const el = document.getElementById('envpill'); if (!el || !CLOUD) return;
   const env = String(CFG.env || (/staging/i.test(location.pathname + location.hostname) ? 'staging' : 'production')).toLowerCase();
-  el.dataset.env = env === 'staging' ? 'staging' : 'production'; el.textContent = env === 'staging' ? 'Staging' : 'Production'; el.hidden = false;
+  el.dataset.env = window.__env = env === 'staging' ? 'staging' : 'production'; el.textContent = env === 'staging' ? 'Staging' : 'Production'; el.hidden = false;
 })();
 let SB = null;
 const cloud = {uid: null, team: null, synced: {}, meta: {}, busy: false, dirty: false, timer: null, orderSig: '', loaded: false};
