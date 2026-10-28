@@ -193,6 +193,11 @@ input.tgl[type="checkbox"]{width:38px;height:22px;border-radius:999px;border:0;b
 input.tgl[type="checkbox"]::after{content:"";display:block;position:absolute;top:3px;left:3px;width:16px;height:16px;border:0;border-radius:50%;background:var(--surface);transform:none;transition:transform .15s}
 input.tgl[type="checkbox"]:checked{background:var(--ink);border:0}
 input.tgl[type="checkbox"]:checked::after{display:block;transform:translateX(16px)}
+.helpwrap{position:relative;display:inline-block}
+.helpq{width:22px;height:22px;border-radius:50%;border:1px solid var(--muted);background:transparent;color:var(--muted);font:inherit;font-size:13px;line-height:1;cursor:help;padding:0}
+.helpq:hover,.helpq:focus-visible{border-color:var(--ink);color:var(--ink)}
+.helpwrap .tip{display:none;position:absolute;left:50%;top:calc(100% + 8px);transform:translateX(-50%);width:300px;max-width:80vw;z-index:50;background:var(--ink);color:var(--bg);border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.45;box-shadow:0 6px 24px rgba(0,0,0,.25)}
+.helpwrap:hover .tip,.helpwrap:focus-within .tip{display:block}
 .subwho{margin:14px 0 2px;font-size:13px;font-weight:600;color:var(--muted)}
 .segb{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
 .segb button{background:var(--surface);color:var(--muted);border:0;padding:6px 12px;cursor:pointer}
@@ -344,6 +349,7 @@ body.marq{user-select:none;-webkit-user-select:none}
 .prog{display:flex;align-items:center;gap:6px}
 .pbar{display:inline-block;width:46px;height:6px;border-radius:3px;background:var(--soft);overflow:hidden}
 .pbar i{display:block;height:100%;background:var(--accent)}
+.tpft2{display:flex;justify-content:flex-end;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px}
 .lpills{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px}
 .lpill{font:inherit;font-size:13.5px;padding:5px 12px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
 .lpill:hover{border-color:var(--muted)}
@@ -359,8 +365,8 @@ body.marq{user-select:none;-webkit-user-select:none}
 .lcol.sover-b{box-shadow:-3px 0 0 0 var(--ink)}
 .lcol.sover-a{box-shadow:3px 0 0 0 var(--ink)}
 .lsec.dz-over,.lcol.dz-over{outline:2px solid var(--ink)}
-.lboard{display:flex;gap:12px;overflow-x:auto;align-items:flex-start;padding-bottom:8px}
-.lcol{flex:0 0 270px;background:var(--soft);border-radius:12px;padding:10px;min-height:140px}
+.lboard{display:flex;gap:14px;overflow-x:auto;align-items:flex-start;justify-content:safe center;padding-bottom:8px}
+.lcol{flex:1 1 320px;min-width:280px;max-width:440px;background:var(--soft);border-radius:12px;padding:10px;min-height:140px}
 .lcol.lnew{background:transparent;border:1px dashed var(--line)}
 .bcards{list-style:none;margin:0;padding:0;min-height:12px}
 .bcard{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-top:8px;cursor:grab;touch-action:none;overflow-wrap:anywhere;font-size:14.5px}
@@ -937,11 +943,11 @@ function tpHtml(t){
   const own = t.owner === S.me && !asgLocked(t), p = t.priority || 2, pset = !!t.priority;
   const chk = '<input type="checkbox" class="chk" id="chk-' + t.id + '" data-chg="toggle" data-id="' + t.id + '"' + (t.done ? ' checked' : '') + (own ? '' : ' disabled') + ' aria-label="Done: ' + esc(t.title) + '">';
   const pri = own ? '<select class="chip' + (pset ? ' p' + p : '') + ' chipsel" data-chg="prioSet" data-id="' + t.id + '" aria-label="Priority">' + priOptions(p, pset ? 'clear' : true) + '</select>' : '<span class="chip' + (t.priority ? ' p' + p : '') + '">' + (t.priority ? PRI_NAME[p] : 'Priority') + '</span>';
-  const meta = own ? '<div class="tmeta dates">' + dateEdit(t) + dueEdit(t) + goalEdit(t) + asgPill(t) + asgBtn(t) + (t.fromLead ? '<span class="chip lead">From Team Lead</span>' : '') + fromChip(t) + '</div>'
+  const meta = own ? '<div class="tmeta dates">' + dateEdit(t) + dueEdit(t) + goalEdit(t) + asgPill(t) + (t.fromLead ? '<span class="chip lead">From Team Lead</span>' : '') + fromChip(t) + '</div>'
     : '<div class="tmeta dates">' + asgInBtn(t) + asgPill(t) + '</div>';
-  return '<div class="tpwrap tp' + (t.done ? ' done' : '') + '"><div class="tphd">' + chk + '<h2>' + esc(t.title) + '</h2>' + (own ? penBtn(t) : '') + '<button type="button" class="tpx" data-act="closeModal" aria-label="Close">×</button></div>' +
-    meta + '<div class="tprow">' + pri + (own ? listPick(t) : '') + '</div>' + (own ? txPanel(t, own, true) : roFacts(t)) +
-    (own ? '<div class="tpft"><button type="button" class="btn small quiet" data-act="trashTask" data-id="' + t.id + '">Delete task</button></div>' : (asgLocked(t) && t.owner === S.me ? '<div class="tpft"><button type="button" class="btn small quiet" data-act="asgClear" data-id="' + t.id + '">Remove from my list</button></div>' : '')) + '</div>';
+  return '<div class="tpwrap tp' + (t.done ? ' done' : '') + '"><div class="tphd">' + chk + '<h2>' + esc(t.title) + '</h2>' + (own ? penBtn(t) + '<button type="button" class="trashbtn" data-act="trashTask" data-id="' + t.id + '" aria-label="Delete task" title="Delete task">' + ICO_TRASH + '</button>' : '') + '<button type="button" class="tpx" data-act="closeModal" aria-label="Close">×</button></div>' +
+    meta + '<div class="tprow">' + pri + '</div>' + (own ? txPanel(t, own, true) : roFacts(t)) +
+    (own ? '<div class="tpft2"><span class="row" style="gap:10px">' + listPick(t) + '</span><span>' + asgBtn(t) + '</span></div>' : (asgLocked(t) && t.owner === S.me ? '<div class="tpft"><button type="button" class="btn small quiet" data-act="asgClear" data-id="' + t.id + '">Remove from my list</button></div>' : '')) + '</div>';
 }
 function kpHtml(k){
   const g = goal(k.goalId), pr = krProgress(k);
@@ -1759,6 +1765,100 @@ function impPanel(){
     '<div class="row" style="margin-top:12px">' + (items.length ? '<button class="btn primary" data-act="impGo">Import ' + items.length + (m.type === 'goals' ? ' key results' : ' tasks') + '</button>' : '') + '<button class="btn" data-act="impCancel">Cancel</button></div>';
 }
 function refreshImp(){ const el = $('#imp-panel'); if (el) el.innerHTML = impPanel(); }
+function todoistCard(){
+  return '<section class="card side"><div class="row between" style="margin-bottom:10px"><h2 style="margin:0">Todoist</h2><span class="chip">Only you</span></div>' +
+    '<p class="muted" style="margin:0 0 10px">Bring a Todoist project over. Tasks land in Need review until you give them a goal.</p>' +
+    '<div class="row" style="flex-wrap:nowrap;gap:8px;align-items:center"><button type="button" class="btn" data-act="tdPick">Import from Todoist</button>' +
+    '<span class="helpwrap"><button type="button" class="helpq" aria-label="How to export from Todoist" aria-describedby="td-tip">?</button>' +
+    '<span class="tip" id="td-tip" role="tooltip"><b>How to export</b><br>1. In Todoist, open the project.<br>2. Click the three dots at the top right, then Export as CSV.<br>3. Click Import from Todoist here and choose the downloaded file.<br><br>The project becomes a list in your Backlog and its sections become sections of that list. Sub-tasks stay sub-tasks. Dates and deadlines come across. Recurring dates are kept as a note.</span></span></div></section>';
+}
+const TD_MON = {jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6, jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12};
+function tdDate(raw){
+  const v = String(raw || '').trim(); if (!v) return null;
+  const mk = (y, m, d, noYear) => {
+    const dt = new Date(Date.UTC(y, m - 1, d));
+    if (dt.getUTCFullYear() !== y || dt.getUTCMonth() !== m - 1 || dt.getUTCDate() !== d || y < 2020 || y > 2100) return null;
+    let iso = y + '-' + pad(m) + '-' + pad(d);
+    if (noYear && iso < addDays(TODAY, -180)) iso = mk(y + 1, m, d);
+    return iso;
+  };
+  const yr = parseISO(TODAY).getFullYear();
+  let m;
+  if ((m = v.match(/^(\d{4})-(\d{2})-(\d{2})/))) return mk(+m[1], +m[2], +m[3]);
+  if ((m = v.match(/^(\d{1,2})[./](\d{1,2})[./](\d{4})$/))) return mk(+m[3], +m[2], +m[1]);
+  if ((m = v.match(/^(\d{1,2})\s+([A-Za-z]{3})[a-z]*\.?(?:\s+(\d{4}))?$/)) && TD_MON[m[2].toLowerCase()]) return mk(+(m[3] || yr), TD_MON[m[2].toLowerCase()], +m[1], !m[3]);
+  if ((m = v.match(/^([A-Za-z]{3})[a-z]*\.?\s+(\d{1,2})(?:,?\s+(\d{4}))?$/)) && TD_MON[m[1].toLowerCase()]) return mk(+(m[3] || yr), TD_MON[m[1].toLowerCase()], +m[2], !m[3]);
+  if (/^today$/i.test(v)) return TODAY;
+  if (/^tomorrow$/i.test(v)) return addDays(TODAY, 1);
+  return null;
+}
+function tdParse(text, fileName){
+  const rows = parseCSV(String(text).replace(/^\uFEFF/, ''));
+  if (!rows.length) return null;
+  const head = rows[0].map(h => h.toUpperCase()), col = n => head.indexOf(n);
+  if (col('TYPE') < 0 || col('CONTENT') < 0) return null;
+  const g = (r, n) => (col(n) < 0 ? '' : (r[col(n)] || '')).trim();
+  const secs = [], tasks = []; let curSec = '', last = null;
+  rows.slice(1).forEach(function(r){
+    const type = g(r, 'TYPE').toLowerCase(), title = g(r, 'CONTENT');
+    if (type === 'note') { if (last && title) last.notes.push('Comment: ' + title); return; }
+    if (type === 'section') { if (title && secs.indexOf(title) < 0) secs.push(title); curSec = title; last = null; return; }
+    if (type !== 'task' || !title) return;
+    const indent = parseInt(g(r, 'INDENT'), 10) || 1;
+    if (indent >= 2 && last) { last.subs.push(title); return; }
+    const pri = {'1': 1, '2': 2, '3': 3}[g(r, 'PRIORITY')] || null;
+    const dRaw = g(r, 'DATE'), kRaw = g(r, 'DEADLINE'), date = tdDate(dRaw), dl = tdDate(kRaw);
+    const notes = [g(r, 'DESCRIPTION')];
+    if (dRaw && !date) notes.push('Todoist date: ' + dRaw);
+    if (kRaw && !dl) notes.push('Todoist deadline: ' + kRaw);
+    if (title.length > 140) notes.unshift('Full title: ' + title);
+    last = {notes: [], title: title, desc: notes.filter(Boolean).join('\n'), priority: pri, date: date, deadline: dl, sec: curSec, subs: []};
+    tasks.push(last);
+  });
+  tasks.forEach(function(t){ if (t.notes.length) t.desc = [t.desc].concat(t.notes).filter(Boolean).join('\n'); });
+  const stem = String(fileName || '').replace(/\.[^.]+$/, '').replace(/\s*\(\d+\)$/, '');
+  return {name: stem, secs: secs, tasks: tasks};
+}
+Object.assign(acts, {
+  tdPick: function(){
+    const f = document.createElement('input'); f.type = 'file'; f.accept = '.csv,text/csv';
+    f.onchange = async function(){
+      const file = f.files && f.files[0]; if (!file) return;
+      const plan = tdParse(await file.text(), file.name);
+      if (!plan) { toast('This does not look like a Todoist export. Use Export as CSV from a Todoist project.'); return; }
+      if (!plan.tasks.length) { toast('No tasks found in this file.'); return; }
+      ui.td = plan;
+      const subs = plan.tasks.reduce((n, t) => n + t.subs.length, 0), dated = plan.tasks.filter(t => t.date || t.deadline).length;
+      openModal('<h2>Import from Todoist</h2><form data-form="tdGo" novalidate>' +
+        '<label class="fld" style="display:block">List name in Backlog<input id="td-name" value="' + esc(plan.name) + '" maxlength="60" autocomplete="off" style="width:100%;box-sizing:border-box;margin-top:4px"></label>' +
+        '<p style="margin:10px 0 0">' + plan.tasks.length + (plan.tasks.length === 1 ? ' task' : ' tasks') + (subs ? ' with ' + subs + (subs === 1 ? ' sub-task' : ' sub-tasks') : '') + ', ' + plan.secs.length + (plan.secs.length === 1 ? ' section' : ' sections') + (dated ? ', ' + dated + ' with dates' : '') + '.</p>' +
+        '<p class="muted" style="margin:6px 0 0">All tasks go to Need review. Once you give a task a goal, it moves into this list.</p>' +
+        '<div class="actions"><button type="button" class="btn" data-act="closeModal">Cancel</button><button type="submit" class="btn primary">Import</button></div></form>');
+      $('#modal').classList.add('center'); const i = $('#td-name'); if (i) { i.focus(); i.select(); }
+    };
+    f.click();
+  }
+});
+Object.assign(forms, {
+  tdGo: function(f){
+    const plan = ui.td, name = $('#td-name', f).value.trim(); if (!plan) return; if (!name) { toast('Add a list name first.'); return; }
+    let l = myLists().find(x => x.name.toLowerCase() === name.toLowerCase());
+    if (!l) { l = {id: uid(), owner: S.me, name: name, secs: []}; S.lists.push(l); }
+    l.secs = l.secs || [];
+    const secId = {};
+    plan.secs.forEach(function(n){ let x = l.secs.find(y => y.name.toLowerCase() === n.toLowerCase()); if (!x) { x = {id: uid(), name: n}; l.secs.push(x); } secId[n] = x.id; });
+    const have = {}; S.tasks.forEach(function(x){ if (x.owner === S.me && x.listId === l.id && !x.deleted) have[x.title + '|' + (x.secId || '')] = 1; });
+    let skipped = 0;
+    plan.tasks.forEach(function(t){
+      if (have[t.title.slice(0, 140) + '|' + (t.sec ? secId[t.sec] : '')]) { skipped++; return; }
+      createTask({title: t.title.slice(0, 140), desc: t.desc, priority: t.priority, date: t.date, deadline: t.deadline, krId: null, needReview: true, listId: l.id, secId: t.sec ? secId[t.sec] : null,
+        subs: t.subs.map(x => ({id: uid(), title: x.slice(0, 140), done: false}))}, '');
+    });
+    ui.td = null; ui.blList = l.id; closeModal(); S.view = 'review'; save(); render();
+    const n = plan.tasks.length - skipped;
+    toast(n + (n === 1 ? ' task' : ' tasks') + ' imported into "' + l.name + '".' + (skipped ? ' ' + skipped + ' already there, skipped.' : ' Give each one a goal and it moves into the list.'));
+  }
+});
 function importCard(){
   const ty = ui.impType || 'tasks';
   return '<section class="card side"><div class="row between" style="margin-bottom:10px"><h2 style="margin:0">Import from Excel or CSV</h2><span class="chip">Only you</span></div>' +
@@ -1821,23 +1921,22 @@ function sGrip(g){ return g.id ? '<span class="sgrip" data-sgrip="' + g.id + '" 
 })();
 function listView(l, mine){
   const tasks = mine.filter(t => t.listId === l.id).sort((a, b) => (a.order || 0) - (b.order || 0));
-  const groups = [{id: '', name: 'No section'}].concat(l.secs || []);
+  const groups = (tasks.some(t => !t.secId) || !(l.secs || []).length ? [{id: '', name: 'No section yet'}] : []).concat(l.secs || []);
   const bar = '<div class="row between" style="margin:0 0 12px;flex-wrap:nowrap;gap:10px"><span class="row" style="flex-wrap:nowrap;min-width:0;gap:6px"><h2 style="margin:0;min-width:0;overflow-wrap:anywhere">' + esc(l.name) + '</h2><button type="button" class="pencil" data-act="renameList" data-id="' + l.id + '" aria-label="Rename list">' + ICO_PENCIL + '</button><button type="button" class="trashbtn" data-act="delList" data-id="' + l.id + '" aria-label="Delete list">' + ICO_TRASH + '</button></span>' +
-    '<span class="segb" role="group" aria-label="List view"><button data-act="lView" data-v="list" aria-pressed="' + (ui.lv !== 'board') + '">List</button><button data-act="lView" data-v="board" aria-pressed="' + (ui.lv === 'board') + '">Board</button></span></div>';
+    '<span class="row" style="flex-wrap:nowrap;gap:14px"><button type="button" class="linklike muted" style="text-decoration:none;opacity:.8;font-size:14px" data-act="addSecBtn" data-id="' + l.id + '">+ Add section</button><span class="segb" role="group" aria-label="List view"><button data-act="lView" data-v="list" aria-pressed="' + (ui.lv !== 'board') + '">List</button><button data-act="lView" data-v="board" aria-pressed="' + (ui.lv === 'board') + '">Board</button></span></span></div>';
   const secBtns = g => g.id ? '<span class="row" style="gap:0;flex-wrap:nowrap"><button type="button" class="pencil" data-act="renameSec" data-id="' + l.id + '" data-sec="' + g.id + '" aria-label="Rename section">' + ICO_PENCIL + '</button><button type="button" class="trashbtn" data-act="delSec" data-id="' + l.id + '" data-sec="' + g.id + '" aria-label="Delete section">' + ICO_TRASH + '</button></span>' : '';
-  const addSec = '<form data-form="addSec" data-id="' + l.id + '" class="qbar dull" novalidate><input id="ns-' + l.id + '" placeholder="+ Add section" maxlength="60" autocomplete="off" aria-label="New section" style="width:100%;box-sizing:border-box;font-size:15px"></form>';
   if (ui.lv === 'board') {
     return bar + '<div class="lboard">' + groups.map(function(g){
       const ts = tasks.filter(t => (t.secId || '') === g.id);
       return '<div class="lcol" data-dzsec="' + g.id + '" data-dzlist="' + l.id + '"><div class="row between" style="flex-wrap:nowrap;margin-bottom:4px"><h3 style="margin:0;font-size:14px">' + sGrip(g) + esc(g.name) + ' <span class="muted">' + ts.length + '</span></h3>' + secBtns(g) + '</div>' +
         '<ul class="bcards" data-list="sec">' + ts.map(t => '<li class="bcard' + (t.priority ? ' p' + t.priority : '') + '" data-item="task" data-id="' + t.id + '" data-grip data-act="edit"><span>' + esc(t.title) + '</span>' + (t.priority ? '<span class="chip p' + t.priority + '">' + PRI_NAME[t.priority] + '</span>' : '') + '</li>').join('') + '</ul>' + listQuick(l.id, g.id) + '</div>';
-    }).join('') + '<div class="lcol lnew">' + addSec + '</div></div>';
+    }).join('') + '</div>';
   }
   return bar + groups.map(function(g){
     const ts = tasks.filter(t => (t.secId || '') === g.id);
     return '<section class="card main lsec" data-dzsec="' + g.id + '" data-dzlist="' + l.id + '"><div class="row between" style="margin-bottom:6px;flex-wrap:nowrap"><h3 style="margin:0">' + sGrip(g) + esc(g.name) + ' <span class="muted" style="font-weight:400">' + ts.length + '</span></h3>' + secBtns(g) + '</div>' +
       '<ul class="tasks big" data-list="sec">' + ts.map(t => taskRow(t, {plan: true, pick: true, chk: true, pill: true, inline: true, drag: true})).join('') + '</ul>' + listQuick(l.id, g.id) + '</section>';
-  }).join('') + '<section class="card main lnew">' + addSec + '</section>';
+  }).join('');
 }
 views.backlog = function(){
   const u = S.me, mine = backlogList(u), L = myLists();
@@ -1858,8 +1957,8 @@ views.backlog = function(){
 function listPick(t){
   const L = myLists(); if (!L.length) return '';
   const l = t.listId ? listOf(t.listId) : null;
-  return '<label class="row" style="gap:6px"><span class="muted">List</span><select class="chipsel" data-chg="taskList" data-id="' + t.id + '"><option value="">Inbox</option>' + L.map(x => '<option value="' + x.id + '"' + (x.id === t.listId ? ' selected' : '') + '>' + esc(x.name) + '</option>').join('') + '</select></label>' +
-    (l && (l.secs || []).length ? '<label class="row" style="gap:6px"><span class="muted">Section</span><select class="chipsel" data-chg="taskSec" data-id="' + t.id + '"><option value="">No section</option>' + l.secs.map(x => '<option value="' + x.id + '"' + (x.id === t.secId ? ' selected' : '') + '>' + esc(x.name) + '</option>').join('') + '</select></label>' : '');
+  return '<label class="row" style="gap:6px"><span class="muted">Backlog list</span><select class="chipsel" data-chg="taskList" data-id="' + t.id + '"><option value="">Inbox</option>' + L.map(x => '<option value="' + x.id + '"' + (x.id === t.listId ? ' selected' : '') + '>' + esc(x.name) + '</option>').join('') + '</select></label>' +
+    (l && t.secId && (l.secs || []).some(x => x.id === t.secId) ? '<span class="chip" title="Section">' + esc(l.secs.find(x => x.id === t.secId).name) + '</span>' : '');
 }
 function rvListSel(t){
   return '<select class="chipsel" data-chg="rvList" data-id="' + t.id + '" aria-label="Choose a list for ' + esc(t.title) + '"><option value="">Choose a list</option><option value="inbox">Inbox</option>' + myLists().map(x => '<option value="' + x.id + '">' + esc(x.name) + '</option>').join('') + '</select>';
@@ -1871,6 +1970,7 @@ function nameModal(title, form, val, extra){
 Object.assign(acts, {
   blList: function(b){ ui.blList = b.dataset.id; render(); },
   lView: function(b){ ui.lv = b.dataset.v; render(); },
+  addSecBtn: function(b){ nameModal('New section', 'addSecM', '', 'data-id="' + b.dataset.id + '"'); },
   newList: function(){ nameModal('New list', 'newList', ''); },
   renameList: function(b){ const l = listOf(b.dataset.id); if (l) nameModal('Rename list', 'renameList', l.name, 'data-id="' + l.id + '"'); },
   renameSec: function(b){ const l = listOf(b.dataset.id), g = l && (l.secs || []).find(x => x.id === b.dataset.sec); if (g) nameModal('Rename section', 'renameSec', g.name, 'data-id="' + l.id + '" data-sec="' + g.id + '"'); },
@@ -1878,7 +1978,7 @@ Object.assign(acts, {
     const l = listOf(b.dataset.id); if (!l) return;
     l.secs = (l.secs || []).filter(x => x.id !== b.dataset.sec);
     S.tasks.forEach(function(t){ if (t.listId === l.id && t.secId === b.dataset.sec) t.secId = null; });
-    save(); toast('Section removed. Its tasks are in No section.'); render();
+    save(); toast('Section removed. Its tasks are in No section yet.'); render();
   },
   delList: function(b){
     const l = listOf(b.dataset.id); if (!l) return;
@@ -1907,6 +2007,10 @@ Object.assign(forms, {
   },
   renameList: function(f){ const l = listOf(f.dataset.id), name = $('#nm-name', f).value.trim(); if (!l || !name) return; l.name = name; closeModal(); save(); render(); },
   renameSec: function(f){ const l = listOf(f.dataset.id), g = l && (l.secs || []).find(x => x.id === f.dataset.sec), name = $('#nm-name', f).value.trim(); if (!g || !name) return; g.name = name; closeModal(); save(); render(); },
+  addSecM: function(f){
+    const l = listOf(f.dataset.id), name = $('#nm-name', f).value.trim(); if (!l) return; if (!name) { toast('Add a name first.'); return; }
+    l.secs = l.secs || []; l.secs.push({id: uid(), name: name}); closeModal(); save(); render();
+  },
   addSec: function(f){
     const l = listOf(f.dataset.id), name = f.querySelector('input').value.trim(); if (!l || !name) return;
     l.secs = l.secs || []; l.secs.push({id: uid(), name: name}); save(); render();
@@ -2307,7 +2411,7 @@ views.review = function(){
     return taskRow(t, {readonly: true, nocheck: true, action: (t.date ? '<span class="muted" style="font-size:12.5px;margin-right:8px">' + esc(fmtDay(t.date)) + '</span>' : '') + asgInBtn(t)});
   }).join('') + '</ul></section>' : '';
   if (!list.length) return asg;
-  return asg + '<section class="card" style="margin-top:28px"><div class="row between" style="flex-wrap:nowrap;align-items:flex-start"><h2 style="margin:0 0 4px;color:var(--warn)">Need review (' + list.length + ')</h2><button type="button" class="trashbtn rvdel" data-act="delReview" aria-label="Delete all tasks in Need review"><span>Delete all</span>' + ICO_TRASH + '</button></div><p class="muted" style="margin:0 0 10px">These tasks lost their goal or their list because it was deleted. Choose a new goal or list for each one and it goes back to where it was.</p>' +
+  return asg + '<section class="card" style="margin-top:28px"><div class="row between" style="flex-wrap:nowrap;align-items:flex-start"><h2 style="margin:0 0 4px;color:var(--warn)">Need review (' + list.length + ')</h2><button type="button" class="trashbtn rvdel" data-act="delReview" aria-label="Delete all tasks in Need review"><span>Delete all</span>' + ICO_TRASH + '</button></div><p class="muted" style="margin:0 0 10px">These tasks need a goal or a list. Choose one for each and it goes back to where it belongs.</p>' +
     (list.length ? '<ul class="tasks big">' + list.map(t => taskRow(t, {plan: true, action: t.listReview ? rvListSel(t) : ''})).join('') + '</ul>' : '<p class="empty">Nothing to review.</p>') + '</section>';
 };
 views.goals = function(){
@@ -2813,7 +2917,7 @@ views.settings = function(){
     '<section class="card side">' + scopeHead('Appearance', 'Only you') + '<div class="frm"><label class="fld">Theme<select id="s-theme" data-chg="theme">' + [['auto', 'Match device'], ['light', 'Light'], ['dark', 'Dark']].map(o => '<option value="' + o[0] + '"' + (S.theme === o[0] ? ' selected' : '') + '>' + o[1] + '</option>').join('') + '</select></label>' +
     '<label class="fld">Week view<select id="s-week" data-chg="weekMode"><option value="work"' + (S.settings.fullWeek ? '' : ' selected') + '>Workdays (Mon to Fri)</option><option value="full"' + (S.settings.fullWeek ? ' selected' : '') + '>Full week (Mon to Sun)</option></select></label>' +
     '<label class="fld">Accent color (default is gray)<select id="s-acc" data-chg="accent">' + ACCENTS.map(a => '<option value="' + a + '"' + (S.accent === a ? ' selected' : '') + '>' + a[0].toUpperCase() + a.slice(1) + '</option>').join('') + '</select></label></div></section>' +
-    importCard() + visCard() +
+    todoistCard() + importCard() + visCard() +
     '<section class="card side">' + scopeHead('Your data', 'Only you') + '<p class="muted" style="margin:0 0 10px">Export your own tasks, reflections and goals. In the real version the team also gets a daily encrypted backup.</p>' +
     '<div class="row"><button class="btn" data-act="exportJson">Copy as JSON</button><button class="btn" data-act="exportCsv">Copy tasks as CSV</button>' + (CLOUD && isLead() ? '<button class="btn" data-act="teamBackup">Download team backup</button>' : '') + (CLOUD && isLead() && window.__env === 'staging' ? '<button class="btn" data-act="impBackup">Import production backup</button>' : '') + '</div></section>' + '</div>';
 
@@ -3332,7 +3436,7 @@ document.addEventListener('click', function(e){
 }, true);
 document.addEventListener('click', function(e){
   if (!ui.sel || !ui.sel.length) return;
-  if (e.target.closest('#selbar')) return;
+  if (e.target.closest('#selbar') || e.target.closest('#kpick') || $('#kpick') || Date.now() - (window.__kpAt || 0) < 400) return;
   if ((e.ctrlKey || e.metaKey || e.shiftKey) && e.target.closest('li.task')) return;
   if (Date.now() - (window.__dragEnd || 0) < 350) return;
   setTimeout(function(){ if (ui.sel.length) { ui.sel = []; render(); } }, 0);
