@@ -1044,7 +1044,7 @@ body.foil .fxtp .fxpm{font-size:13px}
 /* Foil: brand switch, sign-in card, loading screen */
 header.top .brandwrap{cursor:pointer;border-radius:8px;position:relative}
 .fxnew{position:absolute;top:-4px;right:-58px;padding:2px 7px 1px;border-radius:999px;font:700 9px var(--font-mono);letter-spacing:.14em;text-transform:uppercase;color:#14213D;background:linear-gradient(110deg,#FFC300,#FF6FB5,#7AD7F0,#A6F28F,#FFC300) 0 0/300% 100%;box-shadow:0 0 0 1.5px #14213D,0 3px 10px rgba(255,111,181,.45);transform:rotate(6deg);pointer-events:none}
-body.foil .fxnew,body.fxseen .fxnew{display:none}
+body.foil .fxnew,body.fxseen .fxnew,body.fxfirst .fxnew{display:none}
 @media (prefers-reduced-motion:no-preference){.fxnew{animation:fxnewSh 3.2s linear infinite}@keyframes fxnewSh{to{background-position:300% 0}}}
 header.top .brandwrap:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
 .authbox>.brand{cursor:pointer}
@@ -1186,6 +1186,34 @@ body.foil .qag.qfoil{position:relative;text-shadow:none;filter:drop-shadow(0 0 6
 .setpane .qawrap .sect{margin-top:0}
 .setpane .qawrap{margin-top:-8px}
 body.foil .qag.qfoil{display:inline-block;background:linear-gradient(100deg,#FFA800,#FF4FA3 35%,#5B8CFF 68%,#2FC4A5);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:fxglow 2.6s ease-in-out infinite alternate}
+#modal .fxrev{text-align:center;max-width:420px}
+.fxq{display:flex;gap:10px;justify-content:center;align-items:center;margin:18px auto 4px;padding:14px 34px;border:0;border-radius:14px;cursor:pointer;font:800 26px var(--font-mono);color:#14213D;background:linear-gradient(110deg,#FFC300,#FF6FB5 30%,#7C5CFF 55%,#2FC4A5 80%,#FFC300);background-size:300% 100%;box-shadow:0 0 18px rgba(255,111,181,.55),inset 0 0 0 2px rgba(255,255,255,.55)}
+.fxq:hover{transform:translateY(-1px) scale(1.03)}
+@media (prefers-reduced-motion:no-preference){.fxq{animation:fxnewSh 2.4s linear infinite,fxglow 1.8s ease-in-out infinite alternate}@keyframes fxwelIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}#modal .fxwel{animation:fxwelIn .5s ease both}}
+#modal .fxwel{text-align:left;border-radius:16px;padding:6px 4px}
+#modal .fxwel h2{font-size:30px;text-transform:none;font-weight:800;margin:0;background:linear-gradient(100deg,#FFA800,#FF4FA3 35%,#5B8CFF 68%,#2FC4A5);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+#modal .fxwel .fxsub{margin:2px 0 12px;font-weight:600}
+#modal .fxwel ul{margin:0 0 14px;padding-left:18px;display:grid;gap:7px}
+#modal .fxwel .fxgo{background:linear-gradient(110deg,#FFC300,#FF6FB5 45%,#7C5CFF);border:0;color:#14213D;font-weight:700}
+#modal .sheet:has(.fxwel){border:3px solid transparent;background:linear-gradient(135deg,#FFF8E6,#FFEAF4 50%,#E8F0FF) padding-box,linear-gradient(120deg,#FFC300,#FF4FA3,#5B8CFF,#2FC4A5,#FFC300) border-box;background-size:100% 100%,300% 300%;box-shadow:0 0 44px rgba(255,79,163,.4);color:#14213D}
+#modal .fxwel li,#modal .fxwel p,#modal .fxwel b{color:#14213D}
+@media (prefers-reduced-motion:no-preference){#modal .sheet:has(.fxwel){animation:fxborder 5s linear infinite}@keyframes fxborder{to{background-position:0 0,300% 0}}}
+
+/* Foil: holographic background, colored frames, compact team cards */
+body.foil::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.55) 49%,rgba(255,255,255,.0) 60%) 0 0/250% 100%,linear-gradient(125deg,rgba(255,195,0,.26),rgba(255,79,163,.22) 22%,rgba(91,140,255,.26) 45%,rgba(47,196,165,.22) 68%,rgba(255,195,0,.26)) 0 0/300% 300%;animation:fxholo 16s ease-in-out infinite alternate}
+@keyframes fxholo{0%{background-position:130% 0,0% 0%}100%{background-position:-30% 0,100% 100%}}
+:root:not([data-theme=light]) body.foil::after{opacity:.9}
+@media (prefers-color-scheme:light){:root:not([data-theme=dark]) body.foil::after{opacity:1}}
+:root[data-theme=dark] body.foil::after{opacity:.9}
+:root[data-theme=light] body.foil::after{opacity:1}
+body.foil .card,body.foil .card.main{border:2px solid transparent;background:linear-gradient(var(--surface),var(--surface)) padding-box,linear-gradient(120deg,#FFC300,#FF4FA3,#5B8CFF,#2FC4A5,#FFC300) border-box;background-size:100% 100%,300% 100%;box-shadow:0 0 22px rgba(255,79,163,.16)}
+body.foil .tabs{border-bottom:3px solid transparent;border-image:linear-gradient(90deg,#FFC300,#FF4FA3,#5B8CFF,#2FC4A5) 1}
+@media (prefers-reduced-motion:no-preference){body.foil .card{animation:fxframe 9s linear infinite}@keyframes fxframe{to{background-position:0 0,300% 0}}}
+@media (prefers-reduced-motion:reduce){body.foil::after{animation:none;background-position:40% 0,30% 30%}}
+body.foil .sheet:has(.ppeople){width:min(1040px,100%)}
+body.foil .ppeople{width:100%!important}
+body.foil .ppeople .tasks{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px 8px;justify-items:start}
+body.foil .ppeople li.task.fl{zoom:.62}
 @keyframes fxglow{from{filter:drop-shadow(0 0 2px rgba(255,111,181,.2))}to{filter:drop-shadow(0 0 9px rgba(255,111,181,.7))}}
 @media (prefers-reduced-motion:reduce){body.foil .qag.qfoil{animation:none}}
 /* walkthrough, role pop-up, remove member */
@@ -1209,11 +1237,18 @@ body.foil .qag.qfoil{display:inline-block;background:linear-gradient(100deg,#FFA
 body.foil #tour{border:2px solid transparent;background:linear-gradient(var(--surface),var(--surface)) padding-box,linear-gradient(135deg,#FFC300,#FF6FB5,#7AD7F0,#B8F28B) border-box}
 @media (max-width:560px){#tour{width:calc(100vw - 32px);bottom:max(8px,env(safe-area-inset-bottom,0px))}#tour .tr-b{max-height:24vh}}
 .rintro h2{margin:0 0 8px}.rintro h3{margin:14px 0 4px;font-size:.9375rem}.rintro ul{margin:0;padding-left:18px}.rintro li{margin:5px 0}
+#team-card .prow{display:grid;grid-template-columns:minmax(0,1fr) 128px 84px;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+#team-card .phead{border-top:0;padding:6px 0;font:700 .6875rem var(--font-mono,monospace);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+#team-card .pname{min-width:0;display:flex;flex-direction:column;gap:2px}
+#team-card .pname>.muted{font-size:.7812rem;overflow-wrap:anywhere}
+#team-card .prole{width:100%;box-sizing:border-box;height:36px}
+#team-card .prm{width:100%;box-sizing:border-box;justify-content:center;height:36px}
+@media (max-width:520px){#team-card .prow{grid-template-columns:minmax(0,1fr) 112px}#team-card .prm{grid-column:2}#team-card .phead span:last-child{display:none}}
 #rm-go:disabled{opacity:.4;cursor:not-allowed}
 .rmopt{border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:grid;gap:8px}.rmopt legend{padding:0 6px;font-size:.8125rem;color:var(--muted)}.rmopt label{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 </style>
 
-<script>(function(){var f=true;try{f=localStorage.getItem("fx-style")!=="sterling"}catch(e){}function a(){if(f&&document.body)document.body.classList.add("foil")}if(document.body)a();else document.addEventListener("DOMContentLoaded",a)})()</script>
+<script>(function(){var f=false;try{f=localStorage.getItem("fx-style")==="foil"}catch(e){}function a(){if(f&&document.body)document.body.classList.add("foil")}if(document.body)a();else document.addEventListener("DOMContentLoaded",a)})()</script>
 <div id="splash" aria-hidden="true"><div class="fxsp" aria-hidden="true"><div class="fxsp-card"><div class="fxsp-face fxsp-back"><i class="fxsp-band"></i><b>F</b><u></u></div><div class="fxsp-face fxsp-front"><span>?</span></div></div><div class="fxsp-sh"></div><div class="fxsp-t">Opening the pack<span>.</span><span>.</span><span>.</span></div></div><div class="brandwrap"><div class="brand">S<svg aria-hidden="true" focusable="false" viewBox="0 0 70 80"><path d="M 27 6.5 V 52 C 27 67 36 73.5 48 73.5 C 57 73.5 62 69 63.5 62" stroke-width="13"/><path d="M 5 6.5 H 65" stroke-width="13"/><path d="M 3 34.5 H 55" stroke-width="13" stroke-dasharray="10.5 3.5"/></svg>erling<span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span></div><span class="brandsub" aria-hidden="true"><span>T</span><span>R</span><span>A</span><span>C</span><span>K</span><span>E</span><span>R</span></span></div></div></div>
 <div class="app">
   <header class="top">
@@ -1690,6 +1725,7 @@ function doUndo(){
 }
 function tryCloseModal(){
   const m = $('#modal'); if (!m || m.hidden) return;
+  if (m.querySelector('.fxlock')) return;
   const d = m.querySelector('.discard'); if (d) { d.remove(); return; }
   const sh = m.querySelector('.sheet');
   if (ui.mDirty && sh && !ui.rv && !ui.ex && !ui.pr && m.querySelector('form[data-form]')) {
@@ -1992,8 +2028,13 @@ const FX_TIERS = {
 };
 const FX_ORDER = ['base', 'rare', 'foil', 'legend'];
 const FX_ART = {list: 'M20 28h12v12H20z M42 34h38 M20 56h12v12H20z M42 62h38', bars: 'M20 80V54 M40 80V38 M60 80V46 M80 80V24', star: 'M50 14L58 42L86 50L58 58L50 86L42 58L14 50L42 42Z', crown: 'M16 72L20 34L38 52L50 28L62 52L80 34L84 72Z', plane: 'M14 46L86 18L66 84L48 60L14 46Z M48 60L86 18', lens: 'M42 18a24 24 0 100 48a24 24 0 100-48 M60 62L84 86', gear: 'M50 36a14 14 0 100 28a14 14 0 100-28 M50 14v14 M50 72v14 M14 50h14 M72 50h14 M25 25l10 10 M65 65l10 10 M75 25l-10 10 M35 65l-10 10', flag: 'M28 16V86 M28 20h46l-10 16 10 16H28', key: 'M30 50a14 14 0 100-1 M44 50h42 M70 50v14 M82 50v10', mail: 'M16 26h68v48H16z M16 28l34 26 34-26'};
-function fxPreOn(){ try { return localStorage.getItem('fx-style') !== 'sterling'; } catch(e) { return true; } }
-const foilOn = () => { if (S && S.me && S.signedIn && S.settings) { const st = (S.settings.style || {})[S.me]; return st ? st === 'foil' : fxPreOn(); } return fxPreOn(); };
+function fxPreOn(){ try { return localStorage.getItem('fx-style') === 'foil'; } catch(e) { return false; } }
+/* First run: Sterling look until the walkthrough ends, then the Foil reveal. */
+const fxSkip = () => { try { return localStorage.getItem('st-skip-intro') === '1'; } catch(e) { return false; } };
+const fxFirst = () => !!(S && S.me && S.signedIn && S.settings && !fxSkip() && !(S.settings.style || {})[S.me] && !(S.settings.roleSeen || {})[S.me]);
+const fxPending = () => !!(S && S.me && S.settings && (S.settings.reveal || {})[S.me] === 'pending');
+const fxLocked = () => fxFirst() || fxPending();
+const foilOn = () => { if (S && S.me && S.signedIn && S.settings) { const st = (S.settings.style || {})[S.me]; if (st) return st === 'foil'; if (fxFirst()) return false; try { return localStorage.getItem('fx-style') !== 'sterling'; } catch(e) { return true; } } return fxPreOn(); };
 function fxSetStyle(next){
   try { localStorage.setItem('fx-style', next); } catch(e) {}
   if (S.me && S.signedIn) {
@@ -2020,6 +2061,7 @@ const FX_NEW = '1.1.0';
 (function(){ try { if (localStorage.getItem('fx-new-seen') === FX_NEW) document.body.classList.add('fxseen'); } catch(e) {} })();
 function fxSeenNew(){ try { localStorage.setItem('fx-new-seen', FX_NEW); } catch(e) {} document.body.classList.add('fxseen'); }
 function fxOpenMenu(anchor){
+  if (fxLocked()) return;
   fxSeenNew(); ui.tourMenu = true;
   const had = document.getElementById('stylemenu'); fxCloseMenu(); if (had) return;
   const on = foilOn(), r = anchor.getBoundingClientRect(), m = document.createElement('div');
@@ -2061,6 +2103,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') fxClos
   document.addEventListener('mouseleave', clear);
 })();
 function fxToggleStyle(){
+  if (fxLocked()) return;
   const next = foilOn() ? 'sterling' : 'foil';
   try { localStorage.setItem('fx-style', next); } catch(e) {}
   if (S.me && S.signedIn) {
@@ -2746,7 +2789,7 @@ const chg = {
     const t = S.tasks.find(x => x.id === el.dataset.id); if (!t) return;
     clearTimeout(lazyT[t.id]); delete lazyT[t.id];
     if (el.checked && !t.krId) {
-      el.checked = false;
+      el.checked = false; ui.tourBlocked = true;
       const gp = document.querySelector('#modal .goalpill[data-id="' + t.id + '"]') || document.querySelector('.goalpill[data-id="' + t.id + '"]');
       if (gp) { gp.classList.remove('gflash'); void gp.offsetWidth; gp.classList.add('gflash'); setTimeout(function(){ gp.classList.remove('gflash'); }, 1100); }
       else toast('Choose a key result (Goal) before completing this task.');
@@ -2892,6 +2935,8 @@ function render(){
   const sl = $('#setlink'); if (sl) { if (S.view === 'settings') sl.setAttribute('aria-current', 'page'); else sl.removeAttribute('aria-current'); }
   document.body.classList.toggle('notlead', !!me() && !isLead());
   document.body.classList.toggle('foil', foilOn());
+  document.body.classList.toggle('fxfirst', fxLocked());
+  if (S.signedIn && S.settings && !fxLocked()) { try { localStorage.setItem('fx-style', foilOn() ? 'foil' : 'sterling'); } catch(e) {} }
   if (me()) $('#whoami').textContent = CLOUD ? me().name + ' (' + (isLead() ? 'Team lead' : 'Member') + ')' : 'Your details';
   const w = $('#who');
   const ww = $('#whowrap'); if (ww) ww.style.display = window.__env === 'demo' ? '' : 'none';
@@ -3540,7 +3585,7 @@ function personHtml(u){
   }).join('');
   const open = st.all.filter(t => !t.done), plan = open.filter(t => t.date), back = open.filter(t => !t.date), done = st.all.filter(t => t.done);
   const sec = (l, list) => list.length ? '<div class="seclab" style="margin:12px 0 2px">' + l + ' (' + list.length + ')</div><ul class="tasks">' + rows(list) + '</ul>' : '';
-  return '<div class="rvpop" style="width:min(640px,100%)"><div class="row between" style="flex-wrap:nowrap;margin-bottom:4px"><h2 style="margin:0">' + esc(u.name) + (u.id === S.me ? ' (you)' : '') + '</h2><span class="muted">' + esc(u.role) + '</span></div>' +
+  return '<div class="rvpop ppeople" style="width:min(640px,100%)"><div class="row between" style="flex-wrap:nowrap;margin-bottom:4px"><h2 style="margin:0">' + esc(u.name) + (u.id === S.me ? ' (you)' : '') + '</h2><span class="muted">' + esc(u.role) + '</span></div>' +
     teamStatsHtml(st) + (plan.length || back.length ? sec('Planned', plan) + sec('Backlog', back) : '<p class="empty">No open tasks.</p>') + '</div>';
 }
 function openPersonPop(id){
@@ -4733,9 +4778,7 @@ Object.assign(acts, {
   openPerson: function(b){ openPersonPop(b.dataset.id); },
   openPackPerson: function(b){
     const u = user(b.dataset.id); if (!u) return;
-    const ids = teamStats(u).all.filter(t => !t.done).map(t => t.id);
-    if (!ids.length || ui.rip) { openPersonPop(u.id); return; }
-    fxRipStart(ids, TODAY, {id: u.id, name: u.name});
+    openPersonPop(u.id);
   },
   openPeerRev: function(){ ui.pr = null; openPeerRev(); },
   prTab: function(b){ if (ui.pr) prSave(ui.pr); ui.pr = b.dataset.id; const sh = $('#modal .sheet'); if (sh) { sh.innerHTML = peerRevHtml(); const t = document.querySelector('#modal textarea'); if (t) { t.focus(); t.setSelectionRange(t.value.length, t.value.length); } } }
@@ -5649,12 +5692,38 @@ const ROLE_COPY = {
 function introCheck(){
   if (SKIP_INTRO || !me() || !S.signedIn || ui.rip || !$('#modal').hidden || !S.settings) return;
   const k = roleKey(), seen = (S.settings.roleSeen || {})[S.me];
-  if (seen === k) return;
-  S.settings.roleSeen = S.settings.roleSeen || {}; S.settings.roleSeen[S.me] = k; save();
+  if (seen === k) { const st = tourSt(); if (fxPending() && !(st && !st.off && !st.done)) fxRevealOpen(); return; }
+  S.settings.roleSeen = S.settings.roleSeen || {}; S.settings.roleSeen[S.me] = k;
+  if (!seen && !(S.settings.style || {})[S.me]) { S.settings.style = S.settings.style || {}; S.settings.style[S.me] = 'sterling'; S.settings.reveal = S.settings.reveal || {}; S.settings.reveal[S.me] = 'pending'; }
+  save();
   const c = ROLE_COPY[k], first = !seen;
   openModal('<div class="mtype">Your role</div><div class="rintro"><h2>' + (first || k === 'lead' ? 'Congratulations. ' : '') + 'You have been assigned the ' + c.name + ' role.</h2>' +
     '<p>' + c.lead + '</p><h3>What this means</h3><ul>' + c.can.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul><p class="muted">' + esc(c.cant) + '</p>' +
-    '<div class="actions">' + (first ? '<button type="button" class="btn" data-act="modalOff">Not now</button><button type="button" class="btn primary" data-act="tourStart">Start the walkthrough</button>' : '<button type="button" class="btn primary" data-act="modalOff">Got it</button>') + '</div></div>');
+    '<div class="actions">' + (first ? '<button type="button" class="btn" data-act="introLater">Not now</button><button type="button" class="btn primary" data-act="tourStart">Start the walkthrough</button>' : '<button type="button" class="btn primary" data-act="modalOff">Got it</button>') + '</div></div>');
+  $('#modal').classList.add('center');
+}
+
+/* Foil reveal */
+function fxRevealOpen(){
+  if (!$('#modal').hidden || !fxPending()) return;
+  openModal('<div class="mtype">One more thing</div><div class="fxlock fxrev"><h2>This is not the intended way to use the app</h2>' +
+    '<p>The view you are looking at is the plain one. You can switch back to it at any time. Everything works the same in both views, and your tasks, goals and reviews stay where they are.</p>' +
+    '<p class="muted">There is a better view. Press the button to see it.</p>' +
+    '<button type="button" class="fxq" data-act="fxReveal" aria-label="Show the intended view"><span>?</span><span>?</span><span>?</span></button></div>');
+  $('#modal').classList.add('center');
+  const q = document.querySelector('#modal .fxq'); if (q) q.focus();
+}
+function fxWelcomeOpen(){
+  openModal('<div class="mtype">Foil</div><div class="fxwel"><h2>Welcome to Foil</h2><p class="fxsub">The intended way to use the app.</p><ul>' +
+    '<li><b>Every task is a trading card.</b> Cards come in four rarities: Base 60%, Rare 25%, Foil 12% and Legend 3%.</li>' +
+    '<li><b>A new pack every day.</b> Open it to draw your cards. Rarity is decided when the pack opens and stays fixed.</li>' +
+    '<li><b>Late tasks land in the Mailbox</b> and join your cards the next time you open it.</li>' +
+    '<li><b>Click a card to turn it, double-click to open it.</b> A round stamp on the card shows the deadline.</li>' +
+    '<li><b>My Collection</b> in Settings keeps your sealed cards.</li>' +
+    '<li><b>Team packs.</b> Open a teammate\'s pack from the Team tab with the same animation.</li>' +
+    '<li><b>Dark mode</b> with a moving reflection, plus Foil sign-in and loading screens, and sorting by rarity.</li>' +
+    '<li><b>Switch any time</b> from the logo menu at the top. Functionality is identical in both views.</li></ul>' +
+    '<div class="actions"><button type="button" class="btn primary fxgo" data-act="modalOff">Start collecting</button></div></div>');
   $('#modal').classList.add('center');
 }
 
@@ -5665,32 +5734,59 @@ const mineT = () => liveTasks().filter(t => t.owner === S.me);
 const tourT = () => { const st = tourSt(); return st && st.tid ? byId(st.tid) : null; };
 const newMine = () => mineT().find(t => (ui.tb.ids || []).indexOf(t.id) < 0);
 const FOILISH = () => foilOn();
+const tbody = (d, items) => (d ? '<p class="tr-do">' + d + '</p>' : '') + (items && items.length ? '<ul class="trl">' + items.map(i => '<li>' + i + '</li>').join('') + '</ul>' : '');
+const hasKr = () => S.krs.some(k => !k.deleted);
 const TOUR = [
-  {k: 'today', nav: 'today', tg: '#tabs [data-view=today]', t: 'Today', next: 1, b: '<p class="tr-do">Look around <b>Today</b>.</p><ul class="trl"><li>Arrows and Day, Week, Month change the range</li><li>Planned tasks sit in the middle, unfinished ones above</li><li><b>Day planning</b> on the right: your hours per category</li></ul>'},
-  {k: 'style', tg: 'header.top .brandwrap', t: 'Foil and Sterling', b: '<p class="tr-do">Open the <b>logo menu</b> and pick a look.</p><ul class="trl"><li><b>Foil</b>: every task is a trading card</li><li><b>Sterling</b>: a plain list</li><li>Saved for your account</li></ul>', enter: () => { ui.tourMenu = false; }, done: () => !!ui.tourMenu && !$('#stylemenu')},
-  {k: 'add', nav: 'today', tg: '#main [data-act=quick]', t: 'Create a task', b: '<p class="tr-do">Press <b>Add task</b>, type a title, press <b>Enter</b>, then <b>Esc</b>.</p><ul class="trl"><li>The task is planned for today</li></ul>', done: () => !!newMine() && !ui.tp, after: function(st){ const t = newMine(); if (t) { t.tour = true; st.tid = t.id; } }},
-  {k: 'pack', nav: 'today', show: () => FOILISH() && !(S.foil && S.foil.opened && S.foil.opened[TODAY]), tg: '#main [data-act=fxOpen]', t: 'Open today\'s pack', b: '<p class="tr-do">Press <b>Open a pack</b>.</p><ul class="trl"><li>Cards turn over one by one</li><li>Rarity is random: Base 60%, Rare 25%, Foil 12%, Legend 3%</li><li>Over 7 cards: 7 play, the rest open at once</li></ul>', done: () => !!(S.foil && S.foil.opened && S.foil.opened[TODAY])},
-  {k: 'cards', show: FOILISH, next: 1, t: 'Cards', b: '<ul class="trl"><li><b>Click</b> a card: turn it over</li><li><b>Double-click</b>: lift it to edit</li><li>Tasks added later wait in the <b>Mailbox</b> for about a minute</li><li><b>Sent to</b> stamp: you assigned it</li></ul>'},
-  {k: 'open', tg: () => tourT() ? '#main li[data-id="' + tourT().id + '"]' : '', t: 'Open your task', b: '<p class="tr-do"><b>Open</b> your task.</p><ul class="trl"><li>Foil: double-click the card</li><li>Fields: Planned, Deadline, Goal, Priority, List, Assigned</li><li>A plus means the field is empty</li></ul>', done: () => !!tourT() && ui.tp === tourT().id},
-  {k: 'fields', tg: '#modal .sheet', t: 'Priority and goal', b: '<p class="tr-do">Pick a <b>priority</b> or a <b>goal</b>.</p><ul class="trl"><li>Goals and key results have numbers like <b>1.4</b></li></ul>', enter: () => { ui.tb.pr = tourT() && tourT().priority; }, done: () => { const t = tourT(); return !!t && (t.krId || t.priority !== ui.tb.pr); }},
-  {k: 'deadline', tg: '#modal .sheet', t: 'Set a deadline', b: '<p class="tr-do">Set a <b>deadline</b> for today or tomorrow.</p><ul class="trl"><li>Foil: a round <b>stamp</b> appears and the card dims</li><li>Sterling: the deadline shows in the row</li></ul>', done: () => { const t = tourT(); return !!t && !!t.deadline; }},
-  {k: 'close', t: 'Close the window', b: '<p class="tr-do">Press <b>Esc</b>.</p><ul class="trl"><li>Changes save by themselves</li><li>Top pill: Saving, Saved or an error</li><li>The build number next to it opens the release notes</li></ul>', done: () => !ui.tp},
-  {k: 'seal', tg: () => tourT() ? '#main li[data-id="' + tourT().id + '"]' : '', nav: 'today', t: 'Finish the task', b: '<p class="tr-do"><b>Tick</b> the task.</p><ul class="trl"><li>Foil: it is <b>sealed</b> and moves to My Collection</li><li>Sterling: it is checked off</li></ul>', done: () => { const t = tourT(); return !!t && t.done; }},
-  {k: 'backlog', tg: '#tabs [data-view=backlog]', t: 'Backlog', b: '<p class="tr-do">Open <b>Backlog</b>.</p><ul class="trl"><li>Tasks without a date live here</li><li>Lists and sections group them</li></ul>', done: () => S.view === 'backlog'},
-  {k: 'list', show: () => S.view === 'backlog', tg: '#main [data-act=newList]', t: 'Create a list', enter: () => { ui.tb.lists = S.lists.length; }, b: '<p class="tr-do">Press <b>New list</b> and name it.</p><ul class="trl"><li>Add sections inside a list and drag them</li><li>List or Board changes the view</li></ul>', done: () => S.lists.length > ui.tb.lists},
-  {k: 'sort', tg: '#main .sortsel', t: 'Sort', enter: () => { ui.tb.gs = ui.gsort || ''; }, b: '<p class="tr-do">Choose a <b>Sort</b> option.</p><ul class="trl"><li>Priority, Soon, Deadline, Rarity, Newest, Title</li><li>One choice applies to every tab</li></ul>', done: () => (ui.gsort || '') !== ui.tb.gs},
-  {k: 'goals', tg: '#tabs [data-view=goals]', t: 'Goals', b: '<p class="tr-do">Open <b>Goals</b>.</p><ul class="trl"><li>Key results are numbered 1.1, 1.2 and so on</li><li>Status, quarter and notes are yours</li><li><b>Review</b> gathers what you wrote, ready to copy</li></ul>', done: () => S.view === 'goals'},
-  {k: 'goalsLead', only: 'lead', next: 1, t: 'Goals as a team lead', b: '<ul class="trl"><li>Only team leads create, rename and delete goals</li><li>Members see the names and add their own notes</li><li>Deleting a goal sends its tasks to Need review</li></ul>'},
-  {k: 'assign', show: () => S.users.length > 1, t: 'Assign a task', enter: () => { ui.tb.asg = S.tasks.filter(t => t.asg || (t.grp && t.grp.length)).map(t => t.id); }, b: '<p class="tr-do">Make a second task, open it, press <b>+</b> next to Assigned, pick a teammate.</p><ul class="trl"><li>Live version: they receive it for real. Skip if unsure.</li></ul>', done: () => S.tasks.some(t => t.owner === S.me && (t.asg || (t.grp && t.grp.length)) && ui.tb.asg.indexOf(t.id) < 0)},
-  {k: 'asgInfo', show: () => S.users.length > 1, next: 1, t: 'What the pills mean', b: '<ul class="trl"><li><b>Dotted</b> pill: waiting for an answer</li><li><b>Solid</b> pill: the answer, such as Maya accepted</li><li>They answer in Need review: Accept, Decline or Suggest someone</li><li>After accepting, they own it and you see its status</li></ul>'},
-  {k: 'team', tg: '#tabs [data-view=team]', t: 'Team', b: '<p class="tr-do">Open <b>Team</b>.</p><ul class="trl"><li>Foil: each member is a pack</li><li>Sterling: each member is a row</li></ul>', done: () => S.view === 'team' || S.view === 'lead'},
-  {k: 'person', show: () => S.view === 'team' || S.view === 'lead', tg: '#main .fxpackbtn, #main [data-act=openPerson]', t: 'Open a teammate', b: '<p class="tr-do"><b>Click</b> a teammate.</p><ul class="trl"><li>Foil: their pack opens, unopened cards show <b>Unknown rarity</b></li><li>Then their tasks and numbers appear</li><li>You can take a task into your own list</li></ul>', done: () => !!ui.pp || !!(ui.rip && ui.rip.who)},
-  {k: 'closeP', t: 'Close it', b: '<p class="tr-do"><b>Close</b> the pop-up.</p>', done: () => !ui.pp && !ui.rip},
-  {k: 'review', next: 1, t: 'Need review', b: '<ul class="trl"><li>The yellow tab shows only when something needs you</li><li>Assigned tasks, tasks that lost their goal, restored and imported tasks</li><li>Give a task a goal and it leaves the tab</li></ul>'},
-  {k: 'settings', tg: '#setlink', t: 'Settings', b: '<p class="tr-do">Open the <b>gear</b>.</p><ul class="trl"><li>General, My Collection, Privacy, Import, Help</li><li>Your details: lower left</li></ul>', done: () => S.view === 'settings'},
-  {k: 'leadctl', only: 'lead', tg: '.setit.shiny', t: 'Lead Controls', b: '<p class="tr-do">Open <b>Lead Controls</b>.</p><ul class="trl"><li>Invite code: type your own</li><li>People and roles: set roles, <b>Remove</b> a person (two confirmations)</li></ul>', done: () => ui.setTab === 'team'},
-  {k: 'signs', next: 1, t: 'Indicators', b: '<ul class="trl"><li>A blue dot before a task title: your team can see it.</li><li>The yellow Need review tab: something waits for you.</li><li>A round stamp on a card: due today, tomorrow or overdue.</li><li>The pill at the top: Saving, Saved or an error, with the environment and build.</li><li>The New tag by the logo: something new in this build.</li><li>Unknown rarity: a card that has not been opened yet.</li><li>The shining Lead Controls item: team leads only.</li></ul>'},
-  {k: 'end', fin: 1, t: 'You are set', b: '<ul class="trl"><li>Delete the tasks you made, or keep them</li><li>Restart any time: Settings, General, <b>Start the demo again</b></li></ul>'}
+  {k: 'whatis', nav: 'today', next: 1, t: 'One workspace, separate people', b: tbody('', [
+    '<b>Yours</b>: tasks, backlog, day plan, goal status, notes and reviews',
+    '<b>Shared</b>: goal and key result names, and the Team tab, where you see everyone\'s tasks and who has joined',
+    '<b>Private my tasks</b> in Settings hides yours from everyone except team leads',
+    'Built to replace Todoist and the Excel plan, with the team\'s data in its own database'])},
+  {k: 'goalrule', next: 1, t: 'Every task serves a goal', b: tbody('', [
+    'A task <b>cannot be completed</b> without a goal and key result',
+    'It shows up under its key result automatically, per person',
+    'Goals and key results are numbered, like <b>1.4</b>, so everyone names them the same way',
+    'A task that loses its goal goes to <b>Need review</b>'])},
+  {k: 'today', next: 1, t: 'Your day', b: tbody('', [
+    'Plan tasks per day, with Week and Month views and moving tasks between days',
+    '<b>Day planning</b>: hours per category, with time left',
+    'Unfinished tasks stay visible above the plan; nothing rolls over silently'])},
+  {k: 'add', nav: 'today', tg: '#main [data-act=quick]', t: 'Try it: create a task', b: tbody('Press <b>Add task</b>, type a title, press <b>Enter</b>.', ['Use this task for the next steps']), done: () => !!newMine(), after: function(st){ const t = newMine(); if (t) { t.tour = true; st.tid = t.id; } }},
+  {k: 'try', show: hasKr, tg: '#modal .sheet', t: 'No goal, no completion', enter: () => { ui.tourBlocked = false; if (tourT() && ui.tp !== tourT().id) openTaskPop(tourT().id); }, b: tbody('Tick the circle in the task window.', ['It refuses and flashes the Goal field']), done: () => !!ui.tourBlocked},
+  {k: 'goal', show: hasKr, tg: '#modal .sheet', t: 'Attach a goal', enter: () => { if (tourT() && ui.tp !== tourT().id) openTaskPop(tourT().id); }, b: tbody('Pick a <b>goal and key result</b>.', ['The task now appears under that key result in Goals']), done: () => { const t = tourT(); return !!t && !!t.krId; }},
+  {k: 'seal', show: hasKr, tg: '#modal .sheet', t: 'Complete it', enter: () => { if (tourT() && ui.tp !== tourT().id) openTaskPop(tourT().id); }, b: tbody('Tick the circle again.', ['Completed tasks feed the review for that key result']), done: () => { const t = tourT(); return !!t && t.done; }},
+  {k: 'close', tg: '#modal .sheet', t: 'Close the window', b: tbody('Press <b>Esc</b>.', ['Changes save by themselves; the top pill shows Saving, Saved or an error']), done: () => !ui.tp},
+  {k: 'backlog', nav: 'backlog', next: 1, t: 'Backlog', b: tbody('', [
+    'Undated work lives here, grouped in <b>lists</b> and sections',
+    'Sort by Priority, Soon, Deadline, Newest or Title; one choice applies on every tab',
+    '<b>Plan from backlog</b> puts a task on a day'])},
+  {k: 'import', tg: '#setlink', t: 'Bring your data', b: tbody('Open <b>Settings</b>, then <b>Import</b>.', [
+    '<b>Todoist</b>: each project becomes a list, sections and sub-tasks come across',
+    '<b>Excel or CSV</b> files work too',
+    'Imported tasks wait in Need review until they get a goal, so nothing is retyped']), done: () => S.view === 'settings' && ui.setTab === 'import'},
+  {k: 'goals', nav: 'goals', next: 1, t: 'Goals', b: tbody('', [
+    'Tasks group under key results automatically, yours first',
+    'Status, quarter, notes and links are personal; only the names are shared',
+    'Each key result has its own review text, written as you go'])},
+  {k: 'reviews', next: 1, t: 'Reviews build themselves', b: tbody('', [
+    'A short review <b>per key result</b>, whenever something lands',
+    '<b>Peer reviews per person</b> for teammates',
+    'The <b>Review</b> button combines everything, oldest first, into an almost finished review with a Copy button',
+    'Your own reviews and reflections are visible only to you'])},
+  {k: 'leadgoals', only: 'lead', next: 1, t: 'As a team lead', b: tbody('', ['You create, rename and delete the team\'s goals and key results', 'Members add tasks and notes under them'])},
+  {k: 'team', nav: 'team', next: 1, t: 'Your team', b: function(){ return tbody('', [
+    'See who has <b>joined</b> and each person\'s tasks and workload',
+    'Take a teammate\'s task into your own list; it stays in theirs'].concat(roleKey() === 'lead' ? ['Lead view: capacity and planning the week for everyone'] : [])); }},
+  {k: 'assign', show: () => S.users.length > 1, t: 'Send a task to a colleague', enter: () => { ui.tb.asg = S.tasks.filter(t => t.asg || (t.grp && t.grp.length)).map(t => t.id); }, b: tbody('Open a task and press <b>+</b> next to Assigned.', ['They accept, decline or suggest someone else', 'Live version: they receive it for real. Skip if unsure.']), done: () => S.tasks.some(t => t.owner === S.me && (t.asg || (t.grp && t.grp.length)) && ui.tb.asg.indexOf(t.id) < 0)},
+  {k: 'asgInfo', show: () => S.users.length > 1, next: 1, t: 'Following an assignment', b: tbody('', [
+    '<b>Dotted</b> pill: waiting. <b>Solid</b> pill: answered, like Maya accepted',
+    'It lands in their Need review; after accepting they own it and you follow its status',
+    'You can send one task to several people at once'])},
+  {k: 'needreview', next: 1, t: 'Need review', b: tbody('', ['The yellow tab shows only while something needs you', 'Assigned tasks, tasks without a goal, imports and restored items'])},
+  {k: 'settings', tg: '#setlink', t: 'Settings', b: tbody('Open the <b>gear</b>.', ['<b>Private my tasks</b> under Privacy', 'Export your data any time', 'Help answers common questions']), done: () => S.view === 'settings'},
+  {k: 'leadctl', only: 'lead', tg: '.setit.shiny', t: 'Lead Controls', b: tbody('Open <b>Lead Controls</b>.', ['Invite code: type your own', 'People and roles: change roles, remove people', 'Task visibility switch and team backup']), done: () => ui.setTab === 'team'},
+  {k: 'signs', next: 1, t: 'Indicators', b: '<ul class="trl"><li><b>Blue dot</b> before a title: your team can see the task</li><li><b>Yellow tab</b>: Need review has something</li><li><b>Top pill</b>: Saving, Saved or an error; the build number opens the notes</li><li><b>New</b> tag by the logo: news in this build</li><li><b>Shining</b> Lead Controls: team leads only</li></ul>'},
+  {k: 'end', fin: 1, t: 'Done', b: tbody('', ['Delete the tasks you made, or keep them', 'Restart any time: Settings, General, <b>Start the demo again</b>'])}
 ];
 const tourList = () => TOUR.filter(s => !s.only || s.only === roleKey());
 function tourCur(){ const st = tourSt(); if (!st || st.off) return null; return tourList()[st.i] || null; }
@@ -5727,7 +5823,7 @@ function tourPanel(scroll){
   const idx = L.indexOf(s), min = !!ui.tourMin;
   p.className = min ? 'min' : '';
   p.innerHTML = '<div class="tr-bar"><i style="width:' + Math.round((idx) / Math.max(1, L.length - 1) * 100) + '%"></i></div><div class="tr-h"><span class="tr-n">Walkthrough · ' + (idx + 1) + ' of ' + L.length + '</span><span class="grow"></span><button type="button" class="tr-x" data-act="tourMin" aria-label="' + (min ? 'Show the walkthrough' : 'Minimize the walkthrough') + '">' + (min ? '+' : '–') + '</button></div>' +
-    (min ? '' : '<h3>' + esc(s.t) + '</h3><div class="tr-b">' + (/^</.test(s.b) ? s.b : esc(s.b)) + '</div><div class="tr-f"><button type="button" class="linklike muted" data-act="tourEnd">End</button><span class="grow"></span>' +
+    (min ? '' : '<h3>' + esc(s.t) + '</h3><div class="tr-b">' + (function(){ const bb = typeof s.b === 'function' ? s.b() : s.b; return /^</.test(bb) ? bb : esc(bb); })() + '</div><div class="tr-f"><button type="button" class="linklike muted" data-act="tourEnd">End</button><span class="grow"></span>' +
       (s.fin ? '<button type="button" class="btn small" data-act="tourFinish" data-del="0">Keep my tasks</button><button type="button" class="btn small primary" data-act="tourFinish" data-del="1">Delete them</button>' :
         s.done ? '<span class="muted tr-w">Waiting for you</span><button type="button" class="btn small quiet" data-act="tourSkip">Skip step</button>' : '<button type="button" class="btn small primary" data-act="tourNext">Next</button>') + '</div>');
   const sel = typeof s.tg === 'function' ? s.tg() : s.tg; tourHl(sel, scroll);
@@ -5744,14 +5840,17 @@ function tourTick(){
 setInterval(function(){ if (S && S.signedIn && me()) tourTick(); }, 600);
 Object.assign(acts, {
   modalOff: function(){ closeModal(); },
+  demoteSelf: function(){ closeModal(); ui.demoteOk = true; chg.setRole({value: 'member', dataset: {id: S.me}}); ui.demoteOk = false; },
   tourStart: function(){ closeModal(); if (!S.settings) return; ui.tb = {ids: []}; tourSet({i: 0}); ui.tourMin = false; S.view = 'today'; render(); tourGo(0); },
   tourNext: function(){ tourAdvance(); },
   tourSkip: function(){ tourAdvance(); },
   tourMin: function(){ ui.tourMin = !ui.tourMin; tourPanel(false); },
-  tourEnd: function(){ const st = tourSt(); if (st) tourSet({i: st.i, off: true}); tourPanel(); },
+  tourEnd: function(){ const st = tourSt(); if (st) tourSet({i: st.i, off: true}); tourPanel(); if (fxPending()) setTimeout(fxRevealOpen, 200); },
+  introLater: function(){ closeModal(); if (fxPending()) setTimeout(fxRevealOpen, 200); },
+  fxReveal: function(){ closeModal(); S.settings.reveal[S.me] = 'done'; fxSetStyle('foil'); setTimeout(fxWelcomeOpen, 350); },
   tourFinish: function(b){
     if (b.dataset.del === '1') { const ids = S.tasks.filter(t => t.tour && t.owner === S.me).map(t => t.id); S.tasks = S.tasks.filter(t => ids.indexOf(t.id) < 0); }
-    tourSet({done: true, off: true}); tourPanel(); save(); render(); toast(b.dataset.del === '1' ? 'The walkthrough tasks are deleted.' : 'Walkthrough finished.');
+    tourSet({done: true, off: true}); tourPanel(); save(); render(); if (fxPending()) setTimeout(fxRevealOpen, 250); else toast(b.dataset.del === '1' ? 'The walkthrough tasks are deleted.' : 'Walkthrough finished.');
   }
 });
 
@@ -5977,6 +6076,15 @@ forms.signUp = function(f){
 };
 ORD = S.tasks.reduce((m, t) => Math.max(m, t.order || 0), 0);
 chg.setRole = function(el){
+  if (el.value === 'member' && el.dataset.id === S.me && isLead() && !ui.demoteOk) {
+    el.value = 'lead';
+    if (S.users.filter(x => x.role === 'Team lead').length < 2) { toast('The team needs at least one team lead. Make someone else a lead first.'); return; }
+    openModal('<div class="mtype">Your role</div><h2>Make yourself a member?</h2><p class="muted" style="margin:0 0 8px">You are about to give up the Team Lead role.</p>' +
+      '<ul style="margin:0 0 6px;padding-left:18px"><li>You lose Lead Controls, goal and key result management and the Lead view</li><li>Only another team lead can give the role back</li><li>You will not be able to undo this yourself</li></ul>' +
+      '<div class="actions"><button type="button" class="btn primary" data-act="modalOff">Keep Team Lead</button><button type="button" class="btn" style="border-color:var(--bad);color:var(--bad)" data-act="demoteSelf">Make me a member</button></div>');
+    $('#modal').classList.add('center'); return;
+  }
+  ui.demoteOk = false;
   if (CLOUD) return cloudSetRole(el);
   const u = user(el.dataset.id); if (!u || !isLead()) return;
   const lead = u.role === 'Team lead';
@@ -6007,12 +6115,13 @@ function visCard(){
 }
 function teamCard(){
   const rows = S.users.map(function(u){
-    const lead = u.role === 'Team lead', pos = posOf(u);
-    return '<div class="trow"><span style="min-width:0"><b>' + esc(u.name) + '</b>' + (u.id === S.me ? ' <span class="muted">(you)</span>' : '') +
-      '<span class="muted" style="display:block;font-size:.7812rem;overflow-wrap:anywhere">' + esc(emailOf(u)) + (pos ? ' · ' + esc(pos) : '') + '</span></span>' +
-      '<select class="chipsel" data-chg="setRole" data-id="' + u.id + '" aria-label="Role of ' + esc(u.name) + '"><option value="member"' + (lead ? '' : ' selected') + '>Member</option><option value="lead"' + (lead ? ' selected' : '') + '>Team lead</option></select>' + (u.id === S.me ? '' : '<button type="button" class="btn small quiet" data-act="rmMember" data-id="' + u.id + '" aria-label="Remove ' + esc(u.name) + ' from the team">Remove</button>') + '</div>';
+    const lead = u.role === 'Team lead', pos = posOf(u), me0 = u.id === S.me;
+    return '<div class="prow"><span class="pname"><span><b>' + esc(u.name) + '</b>' + (me0 ? ' <span class="muted">(you)</span>' : '') + '</span>' +
+      '<span class="muted">' + esc(emailOf(u)) + (pos ? ' · ' + esc(pos) : '') + '</span></span>' +
+      '<select class="chipsel prole" data-chg="setRole" data-id="' + u.id + '" aria-label="Role of ' + esc(u.name) + '"><option value="member"' + (lead ? '' : ' selected') + '>Member</option><option value="lead"' + (lead ? ' selected' : '') + '>Team lead</option></select>' +
+      (me0 ? '<span class="prm"></span>' : '<button type="button" class="btn small quiet prm" data-act="rmMember" data-id="' + u.id + '" aria-label="Remove ' + esc(u.name) + ' from the team">Remove</button>') + '</div>';
   }).join('');
-  return '<section class="card side" id="team-card">' + scopeHead('People and roles', 'Team leads only') + rows + '</section>';
+  return '<section class="card side" id="team-card">' + scopeHead('People and roles', 'Team leads only') + '<div class="prow phead" aria-hidden="true"><span>Person</span><span>Role</span><span></span></div>' + rows + '</section>';
 }
 function profileHtml(u){
   const lead = u.role === 'Team lead';
