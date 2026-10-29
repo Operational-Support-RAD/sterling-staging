@@ -1188,6 +1188,27 @@ body.foil .qag.qfoil{position:relative;text-shadow:none;filter:drop-shadow(0 0 6
 body.foil .qag.qfoil{display:inline-block;background:linear-gradient(100deg,#FFA800,#FF4FA3 35%,#5B8CFF 68%,#2FC4A5);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:fxglow 2.6s ease-in-out infinite alternate}
 @keyframes fxglow{from{filter:drop-shadow(0 0 2px rgba(255,111,181,.2))}to{filter:drop-shadow(0 0 9px rgba(255,111,181,.7))}}
 @media (prefers-reduced-motion:reduce){body.foil .qag.qfoil{animation:none}}
+/* walkthrough, role pop-up, remove member */
+#tour{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:max(16px,env(safe-area-inset-bottom,0px));width:min(380px,calc(100vw - 32px));z-index:70;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.28);padding:0 16px 14px;overflow:hidden}
+#tour.min{width:auto;padding-bottom:0}
+#tour .tr-bar{height:3px;background:var(--soft);margin:0 -16px}
+#tour .tr-bar i{display:block;height:100%;background:var(--ink);transition:width .4s}
+#tour .tr-h{display:flex;align-items:center;gap:8px;padding:8px 0 2px}
+#tour .tr-n{font:700 .6875rem var(--font-mono,monospace);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+#tour .tr-x{border:0;background:none;color:var(--ink);font-size:1.25rem;line-height:1;cursor:pointer;min-width:32px;min-height:32px}
+#tour h3{margin:4px 0 6px;font-size:1.0625rem}
+#tour .tr-b{font-size:.875rem;line-height:1.45;max-height:34vh;overflow:auto}
+#tour .tr-f{display:flex;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap}
+#tour .tr-w{font-size:.75rem}
+#tour .trl{margin:0;padding-left:18px}
+#tour .trl li{margin:3px 0}
+.tour-hl{outline:3px solid #FF6FB5!important;outline-offset:3px;border-radius:10px;position:relative;z-index:5}
+@media (prefers-reduced-motion:no-preference){.tour-hl{animation:tourpulse 1.6s ease-in-out infinite}@keyframes tourpulse{50%{outline-color:#FFC300;outline-offset:6px}}}
+body.foil #tour{border:2px solid transparent;background:linear-gradient(var(--surface),var(--surface)) padding-box,linear-gradient(135deg,#FFC300,#FF6FB5,#7AD7F0,#B8F28B) border-box}
+@media (max-width:560px){#tour{width:calc(100vw - 32px);bottom:max(8px,env(safe-area-inset-bottom,0px))}#tour .tr-b{max-height:24vh}}
+.rintro h2{margin:0 0 8px}.rintro h3{margin:14px 0 4px;font-size:.9375rem}.rintro ul{margin:0;padding-left:18px}.rintro li{margin:5px 0}
+#rm-go:disabled{opacity:.4;cursor:not-allowed}
+.rmopt{border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:grid;gap:8px}.rmopt legend{padding:0 6px;font-size:.8125rem;color:var(--muted)}.rmopt label{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 </style>
 
 <script>(function(){var f=true;try{f=localStorage.getItem("fx-style")!=="sterling"}catch(e){}function a(){if(f&&document.body)document.body.classList.add("foil")}if(document.body)a();else document.addEventListener("DOMContentLoaded",a)})()</script>
@@ -1997,7 +2018,7 @@ const FX_NEW = '1.1.0';
 (function(){ try { if (localStorage.getItem('fx-new-seen') === FX_NEW) document.body.classList.add('fxseen'); } catch(e) {} })();
 function fxSeenNew(){ try { localStorage.setItem('fx-new-seen', FX_NEW); } catch(e) {} document.body.classList.add('fxseen'); }
 function fxOpenMenu(anchor){
-  fxSeenNew();
+  fxSeenNew(); ui.tourMenu = true;
   const had = document.getElementById('stylemenu'); fxCloseMenu(); if (had) return;
   const on = foilOn(), r = anchor.getBoundingClientRect(), m = document.createElement('div');
   m.id = 'stylemenu'; m.className = 'stm'; m.setAttribute('role', 'menu');
@@ -2891,6 +2912,7 @@ function render(){
   renderSelBar();
   if (ui.fxAnim) { const fid = ui.fxAnim; ui.fxAnim = null; const fe = document.querySelector('.fxcard[data-id="' + fid + '"]'); if (fe) { fe.classList.remove('up'); void fe.offsetWidth; requestAnimationFrame(function(){ fe.classList.add('up'); }); } }
   if (ui.fxDeal) { setTimeout(function(){ ui.fxDeal = 0; }, 50); }
+  introCheck(); tourPanel(false);
 }
 
 /* completed tasks are locked: only the checkbox (and the dropdown caret/title) respond */
@@ -4279,6 +4301,9 @@ function exportData(kind){
 }
 const scopeHead = (title, scope) => '<div class="row between" style="margin-bottom:10px"><h2 style="margin:0">' + title + '</h2><span class="chip">' + scope + '</span></div>';
 const QA_COMMON = [
+  ['What is the walkthrough and how do I run it again?', ['A guided demo that takes you through creating, planning and finishing tasks, packs, lists, goals, assigning, the Team tab and Settings. Open Settings, General and press Start the demo again. Tasks you create in it are marked, and the last step offers to delete them.']],
+  ['Why did a pop-up tell me my role?', ['It shows the first time you sign in and every time a team lead changes your role. It lists what the role allows. Members plan their own work, link it to goals and work with teammates. Team leads also manage goals, roles, people and the team settings.']],
+  ['How long do I stay signed in?', ['24 hours after you enter your email and password. After that the sign-in screen asks for them again.']],
   ['What is the difference between Today, Backlog and Goals?', ['Today is your plan for one day. Backlog holds tasks that have no date yet, grouped into your own lists. Goals shows the goals and key results the team lead set for the year.', 'A task connects to a key result, so the work you plan on Today rolls up into the goal it serves.']],
   ['How do I add a task?', ['Press Add task on Today, Backlog or inside a key result. The Task pop-up opens with the title field on top. Type the title and press Enter, then set Planned, Deadline, Goal, Priority, List and Assigned, add sub-tasks or a note.', 'If you close the pop-up before typing a title, nothing is created.']],
   ['What do the numbers next to goals and key results mean?', ['A goal has a number such as 2, and its key results are numbered 2.1, 2.2 and so on. They are always visible so you can say "2.1" in a meeting.']],
@@ -4301,6 +4326,7 @@ const QA_MEMBER = [
   ['Can I give a task to a teammate?', ['Yes. Use Assign in the task pop-up. The teammate decides whether to accept, so nothing lands on their plan without their say.']]
 ];
 const QA_LEAD = [
+  ['How do I remove someone from the team?', ['Open Settings, Lead Controls, People and roles and press Remove next to the person. A first pop-up asks if you are sure. A second one shows how many tasks they have, asks you to delete them or give them to another member, and needs you to type their name. Tasks other people assigned to them lose the Assigned to pill. This cannot be undone.']],
   ['Who can create goals and key results?', ['Only team leads. Members add tasks under key results. Deleting a goal or key result sends the tasks connected to it to Need review, so check the count in the confirmation before you delete.']],
   ['How do I plan a teammate\'s week?', ['Open Lead view and press + in a person\'s cell for a day. The task appears in their day with a From Team Lead tag, with no accept step.']],
   ['What is Lead Controls?', ['A section of Settings that only team leads see. It holds the team invite code, People and roles, the task visibility switch and, in the live version, the team backup. The item shines in the list so you can find it.']],
@@ -4389,6 +4415,7 @@ function setPane(tab){
     return h('Privacy and data') +
       srow('Private my tasks', 'Hides all your tasks from everyone except team leads. Applies to existing and new tasks.', '<input type="checkbox" class="tgl" data-chg="privTasks"' + ((S.settings.privTasks || {})[S.me] ? ' checked' : '') + ' aria-label="Private my tasks">') +
       visCard() + trashRow +
+      srow('Walkthrough', 'A guided demo that walks through every part of the app. You click and create things as you go. Tasks you make in it are marked so you can delete them at the end.', '<button type="button" class="btn" data-act="tourStart">Start the demo again</button>') +
       srow('Your data', 'Export your own tasks, reflections and goals. In the real version the team also gets a daily encrypted backup.', '<span class="row" style="justify-content:flex-end"><button class="btn" data-act="exportJson">Copy as JSON</button><button class="btn" data-act="exportCsv">Copy tasks as CSV</button></span>');
   }
   if (tab === 'import') return h('Import') + todoistCard() + importCard();
@@ -5314,6 +5341,10 @@ const BUILDS = [
     'My Collection in Settings shows your finished cards by rarity. Settings is now a panel with General, My Collection, Privacy, Import, Lead Controls, Help and Browser, and a button for your details at the lower left. Lead Controls is for team leads only.',
     'The team lead can type their own invite code in Lead Controls. It is saved as typed.',
     'Sort menu on Today, Backlog, My Collection and key results, in both looks: Priority, Soon, Deadline, Rarity, Newest and Title.',
+    'A pop-up tells you your role, Member or Team Lead, and what it allows. It appears the first time you sign in and again whenever a team lead changes your role.',
+    'A guided walkthrough takes you through creating, planning, finishing and assigning tasks, packs, lists, goals, the Team tab and Settings. Settings, General has Start the demo again.',
+    'Team leads can remove a person from Lead Controls, with two confirmations. Their tasks are deleted or given to another member, and tasks others assigned to them lose the Assigned to pill.',
+    'You stay signed in for 24 hours after you enter your email and password. After that the sign-in screen asks again.',
     'In Foil, Key result pop-ups show small cards, and Need review has its own frame. Foil has a dark mode with a moving reflection, its own sign-in and loading screens, and a Help section for Foil questions.'
   ]},
   {n: '1.0.2', date: '2026-10-29', title: 'Task window, goal numbers, private tasks and cleaner lists', items: [
@@ -5584,6 +5615,194 @@ async function enterCloud(){
   if (cloud.dirty) flush();
   return true;
 }
+/* ---------- Role pop-up, walkthrough and removing members (build 1.1.0) ---------- */
+const SKIP_INTRO = (function(){ try { return localStorage.getItem('st-skip-intro') === '1'; } catch(e) { return false; } })();
+const roleKey = () => (me() && isLead()) ? 'lead' : 'member';
+const ROLE_COPY = {
+  member: {
+    name: 'Member',
+    lead: 'You can plan your own work, link it to the team goals and work with your teammates.',
+    can: [
+      'Plan your day: add tasks, set hours per category, move tasks between days and the backlog.',
+      'Link tasks to the team\'s goals and key results. Your status, notes and reflections on them are yours alone.',
+      'Assign a task to a teammate. They accept, decline or suggest someone else, and you see the answer.',
+      'Take a teammate\'s task into your own list from the Team tab. It stays in their list too.',
+      'Choose the Foil or Sterling look, import from Todoist, export your data, and hide your tasks from teammates with Private my tasks.'
+    ],
+    cant: 'A team lead creates and deletes goals and key results, changes roles, removes people, sets the invite code and the team rules.'
+  },
+  lead: {
+    name: 'Team Lead',
+    lead: 'You can do everything a member does and you look after the team\'s structure.',
+    can: [
+      'Create, rename and delete the team\'s goals and key results. Only their names are shared; status, notes and links stay personal.',
+      'Lead Controls in Settings (it shines): the team invite code, People and roles, removing people, the task visibility switch and the team backup.',
+      'Make other members team leads, or return a lead to member. The team always keeps at least one lead.',
+      'Remove a person from the team and decide what happens to their tasks.',
+      'See every member\'s tasks and capacity in the Team tab, and plan the week.'
+    ],
+    cant: 'Team leads can also see tasks that members have marked Private.'
+  }
+};
+function introCheck(){
+  if (SKIP_INTRO || !me() || !S.signedIn || ui.rip || !$('#modal').hidden || !S.settings) return;
+  const k = roleKey(), seen = (S.settings.roleSeen || {})[S.me];
+  if (seen === k) return;
+  S.settings.roleSeen = S.settings.roleSeen || {}; S.settings.roleSeen[S.me] = k; save();
+  const c = ROLE_COPY[k], first = !seen;
+  openModal('<div class="mtype">Your role</div><div class="rintro"><h2>' + (first || k === 'lead' ? 'Congratulations. ' : '') + 'You have been assigned the ' + c.name + ' role.</h2>' +
+    '<p>' + c.lead + '</p><h3>What this means</h3><ul>' + c.can.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul><p class="muted">' + esc(c.cant) + '</p>' +
+    '<div class="actions">' + (first ? '<button type="button" class="btn" data-act="modalOff">Not now</button><button type="button" class="btn primary" data-act="tourStart">Start the walkthrough</button>' : '<button type="button" class="btn primary" data-act="modalOff">Got it</button>') + '</div></div>');
+  $('#modal').classList.add('center');
+}
+
+/* walkthrough */
+const tourSt = () => (S.me && S.signedIn && S.settings && S.settings.tour) ? S.settings.tour[S.me] : null;
+function tourSet(v){ S.settings.tour = S.settings.tour || {}; S.settings.tour[S.me] = v; save(); }
+const mineT = () => liveTasks().filter(t => t.owner === S.me);
+const tourT = () => { const st = tourSt(); return st && st.tid ? byId(st.tid) : null; };
+const newMine = () => mineT().find(t => (ui.tb.ids || []).indexOf(t.id) < 0);
+const FOILISH = () => foilOn();
+const TOUR = [
+  {k: 'today', nav: 'today', tg: '#tabs [data-view=today]', t: 'Today', next: 1, b: 'Today is your working day. The arrows move between days, and Day, Week and Month change the range. Planned tasks sit in the middle, anything you did not finish shows above them, and Day planning on the right is where you set your hours per category.'},
+  {k: 'style', tg: 'header.top .brandwrap', t: 'Foil and Sterling', b: 'The logo is a switch. Foil turns every task into a trading card, Sterling is the plain list. Your choice is saved for your account and the sign-in screen has the same switch. Open the menu and pick the look you want.', enter: () => { ui.tourMenu = false; }, done: () => !!ui.tourMenu && !$('#stylemenu')},
+  {k: 'add', nav: 'today', tg: '#main [data-act=quick]', t: 'Create a task', b: 'Press Add task and type a title. A task window opens; press Enter to create the task, then close the window with Esc. The task is planned for the day you are looking at.', done: () => !!newMine() && !ui.tp, after: function(st){ const t = newMine(); if (t) { t.tour = true; st.tid = t.id; } }},
+  {k: 'pack', nav: 'today', show: () => FOILISH() && !(S.foil && S.foil.opened && S.foil.opened[TODAY]), tg: '#main [data-act=fxOpen]', t: 'Open today\'s pack', b: 'Each day is a pack. Open it to rip the pack and turn its cards over one at a time. Rarity is a random draw: Base 60%, Rare 25%, Foil 12%, Legend 3%. It never depends on priority and never changes. Packs with more than 7 cards show 7 and open the rest at once.', done: () => !!(S.foil && S.foil.opened && S.foil.opened[TODAY])},
+  {k: 'cards', show: FOILISH, next: 1, t: 'Cards', b: 'Click a card to turn it over to the plain back. Double-click lifts it to the middle to edit. Tasks you add after the pack is open arrive in the Mailbox sealed and can be flipped after about a minute. A task you assigned to someone shows a Sent to stamp.'},
+  {k: 'open', tg: () => tourT() ? '#main li[data-id="' + tourT().id + '"]' : '', t: 'Open your task', b: 'Click the task you just made. In Foil, click it once to turn the card over and twice to open it. The task window holds every field: Planned, Deadline, Goal, Priority, List and Assigned. An empty field shows a plus.', done: () => !!tourT() && ui.tp === tourT().id},
+  {k: 'fields', tg: '#modal .sheet', t: 'Priority and goal', b: 'Pick a priority and, if the team has goals, a goal and key result. Goals and key results carry numbers such as 1.4 so everyone names them the same way.', enter: () => { ui.tb.pr = tourT() && tourT().priority; }, done: () => { const t = tourT(); return !!t && (t.krId || t.priority !== ui.tb.pr); }},
+  {k: 'deadline', tg: '#modal .sheet', t: 'Set a deadline', b: 'Set a deadline for today or tomorrow. In Foil a card due today, tomorrow or overdue gets a round stamp with the date and the rest of the card dims. In Sterling the deadline shows in the task row.', done: () => { const t = tourT(); return !!t && !!t.deadline; }},
+  {k: 'close', t: 'Close the window', b: 'Press Esc or the close button. Changes save by themselves. The pill at the top shows Saving, Saved or an error, and the build number next to it opens the release notes.', done: () => !ui.tp},
+  {k: 'seal', tg: () => tourT() ? '#main li[data-id="' + tourT().id + '"]' : '', nav: 'today', t: 'Finish the task', b: 'Tick the task. In Foil it is sealed with a stamp and moves to My Collection in Settings, grouped by rarity. In Sterling it is checked off.', done: () => { const t = tourT(); return !!t && t.done; }},
+  {k: 'backlog', tg: '#tabs [data-view=backlog]', t: 'Backlog', b: 'Open Backlog. Tasks without a date live here. Use lists to group them and sections to split a list. In Foil the cards stay full and small, side by side.', done: () => S.view === 'backlog'},
+  {k: 'list', show: () => S.view === 'backlog', tg: '#main [data-act=newList]', t: 'Create a list', enter: () => { ui.tb.lists = S.lists.length; }, b: 'Press New list, name it and save. Then open it and press Add section to split it. Sections can be dragged to reorder, and List or Board changes the view.', done: () => S.lists.length > ui.tb.lists},
+  {k: 'sort', tg: '#main .sortsel', t: 'Sort', enter: () => { ui.tb.gs = ui.gsort || ''; }, b: 'The Sort menu is on Today, Backlog, My Collection and key results. Priority, Soon (closest planned date), Deadline (closest first), Rarity, Newest and Title. One choice applies to every tab. Try one.', done: () => (ui.gsort || '') !== ui.tb.gs},
+  {k: 'goals', tg: '#tabs [data-view=goals]', t: 'Goals', b: 'Open Goals. Each goal has key results numbered 1.1, 1.2 and so on. You set your own status, quarter, notes and reflections. The Review button gathers what you wrote, oldest first, ready to copy for a review.', done: () => S.view === 'goals'},
+  {k: 'goalsLead', only: 'lead', next: 1, t: 'Goals as a team lead', b: 'Only team leads create, rename and delete goals and key results. Members see the names and add their own notes. Deleting a goal sends its tasks to Need review.'},
+  {k: 'assign', show: () => S.users.length > 1, t: 'Assign a task', enter: () => { ui.tb.asg = S.tasks.filter(t => t.asg || (t.grp && t.grp.length)).map(t => t.id); }, b: 'Make a second task, open it and press the plus next to Assigned, then pick a teammate. In the live version they receive it for real, so choose someone who expects it, or skip this step.', done: () => S.tasks.some(t => t.owner === S.me && (t.asg || (t.grp && t.grp.length)) && ui.tb.asg.indexOf(t.id) < 0)},
+  {k: 'asgInfo', show: () => S.users.length > 1, next: 1, t: 'What the pills mean', b: 'A dotted Assigned to pill means the person has not answered yet. A solid pill carries the answer, such as Maya accepted. The person gets the task at the top of their Need review tab and answers Accept, Decline or Suggest someone else. After they accept, they own it and you only see its status.'},
+  {k: 'team', tg: '#tabs [data-view=team]', t: 'Team', b: 'Open Team. In Foil each member is a pack with their name. In Sterling each member is a row.', done: () => S.view === 'team' || S.view === 'lead'},
+  {k: 'person', show: () => S.view === 'team' || S.view === 'lead', tg: '#main .fxpackbtn, #main [data-act=openPerson]', t: 'Open a teammate', b: 'Click a member. In Foil their pack opens with the same animation; cards they have not opened show Unknown rarity. Then their tasks and numbers appear. You can take a task into your own list from there.', done: () => !!ui.pp || !!(ui.rip && ui.rip.who)},
+  {k: 'closeP', t: 'Close it', b: 'Close the pop-up to continue.', done: () => !ui.pp && !ui.rip},
+  {k: 'review', next: 1, t: 'Need review', b: 'The yellow Need review tab shows only when something needs you: assigned tasks waiting for your answer, tasks whose goal or key result was deleted, restored tasks and imported tasks. Give a task a goal and it leaves the tab.'},
+  {k: 'settings', tg: '#setlink', t: 'Settings', b: 'Open the gear. General has appearance, week start and the walkthrough. My Collection (Foil) holds your sealed cards. Privacy has Private my tasks. Import brings Todoist projects. Help answers questions, and your details sit at the lower left.', done: () => S.view === 'settings'},
+  {k: 'leadctl', only: 'lead', tg: '.setit.shiny', t: 'Lead Controls', b: 'Open Lead Controls. Type your own invite code and save. Under People and roles you set roles and press Remove for a person: two confirmations, then you choose to delete their tasks or give them to another member. Tasks others assigned to them lose the Assigned to pill.', done: () => ui.setTab === 'team'},
+  {k: 'signs', next: 1, t: 'Indicators', b: '<ul class="trl"><li>A blue dot before a task title: your team can see it.</li><li>The yellow Need review tab: something waits for you.</li><li>A round stamp on a card: due today, tomorrow or overdue.</li><li>The pill at the top: Saving, Saved or an error, with the environment and build.</li><li>The New tag by the logo: something new in this build.</li><li>Unknown rarity: a card that has not been opened yet.</li><li>The shining Lead Controls item: team leads only.</li></ul>'},
+  {k: 'end', fin: 1, t: 'You are set', b: 'That is the whole app. The tasks you made in this walkthrough are marked. Delete them now or keep them. You can run the walkthrough again any time from Settings, General, Start the demo again.'}
+];
+const tourList = () => TOUR.filter(s => !s.only || s.only === roleKey());
+function tourCur(){ const st = tourSt(); if (!st || st.off) return null; return tourList()[st.i] || null; }
+function tourGo(i){
+  const st = tourSt(); if (!st) return; const L = tourList();
+  while (L[i] && L[i].show && !L[i].show()) i++;
+  const n = Object.assign({}, st, {i: i}); tourSet(n);
+  ui.tb = {ids: mineT().map(t => t.id)};
+  const s = L[i];
+  if (s) { if (s.nav && S.view !== s.nav) { S.view = s.nav; render(); } if (s.enter) s.enter(); }
+  tourPanel(true);
+}
+function tourAdvance(){ const st = tourSt(); if (st) tourGo(st.i + 1); }
+function tourHl(sel, scroll){
+  document.querySelectorAll('.tour-hl').forEach(e => e.classList.remove('tour-hl'));
+  if (!sel) return;
+  let el = null; try { el = document.querySelector(sel); } catch(e) {}
+  if (!el) return; el.classList.add('tour-hl');
+  if (scroll) { const r = el.getBoundingClientRect(); if (r.top < 70 || r.bottom > innerHeight - 290) { try { el.scrollIntoView({block: 'center', behavior: 'smooth'}); } catch(e) {} } }
+}
+function tourPanel(scroll){
+  let p = document.getElementById('tour'); const s = tourCur(), L = tourList(), st = tourSt();
+  if (!s || !me()) { if (p) p.remove(); tourHl(''); return; }
+  if (!p) { p = document.createElement('div'); p.id = 'tour'; p.setAttribute('role', 'region'); p.setAttribute('aria-label', 'Walkthrough'); document.body.appendChild(p); }
+  const idx = L.indexOf(s), min = !!ui.tourMin;
+  p.className = min ? 'min' : '';
+  p.innerHTML = '<div class="tr-bar"><i style="width:' + Math.round((idx) / Math.max(1, L.length - 1) * 100) + '%"></i></div><div class="tr-h"><span class="tr-n">Walkthrough · ' + (idx + 1) + ' of ' + L.length + '</span><span class="grow"></span><button type="button" class="tr-x" data-act="tourMin" aria-label="' + (min ? 'Show the walkthrough' : 'Minimize the walkthrough') + '">' + (min ? '+' : '–') + '</button></div>' +
+    (min ? '' : '<h3>' + esc(s.t) + '</h3><div class="tr-b">' + (/^</.test(s.b) ? s.b : esc(s.b)) + '</div><div class="tr-f"><button type="button" class="linklike muted" data-act="tourEnd">End</button><span class="grow"></span>' +
+      (s.fin ? '<button type="button" class="btn small" data-act="tourFinish" data-del="0">Keep my tasks</button><button type="button" class="btn small primary" data-act="tourFinish" data-del="1">Delete them</button>' :
+        s.done ? '<span class="muted tr-w">Waiting for you</span><button type="button" class="btn small quiet" data-act="tourSkip">Skip step</button>' : '<button type="button" class="btn small primary" data-act="tourNext">Next</button>') + '</div>');
+  const sel = typeof s.tg === 'function' ? s.tg() : s.tg; tourHl(sel, scroll);
+}
+function tourTick(){
+  const s = tourCur(); if (!s) { if (document.getElementById('tour')) tourPanel(); return; }
+  if (!document.getElementById('tour')) tourPanel(true);
+  else { const sel = typeof s.tg === 'function' ? s.tg() : s.tg; if (sel && !document.querySelector('.tour-hl')) tourHl(sel, false); }
+  if (s.done && ui.tb && !ui.tourAdv) {
+    let ok = false; try { ok = s.done(); } catch(e) {}
+    if (ok) { ui.tourAdv = true; const st = tourSt(); if (s.after) s.after(st); tourSet(st); setTimeout(function(){ ui.tourAdv = false; tourAdvance(); }, 450); }
+  }
+}
+setInterval(function(){ if (S && S.signedIn && me()) tourTick(); }, 600);
+Object.assign(acts, {
+  modalOff: function(){ closeModal(); },
+  tourStart: function(){ closeModal(); if (!S.settings) return; ui.tb = {ids: []}; tourSet({i: 0}); ui.tourMin = false; S.view = 'today'; render(); tourGo(0); },
+  tourNext: function(){ tourAdvance(); },
+  tourSkip: function(){ tourAdvance(); },
+  tourMin: function(){ ui.tourMin = !ui.tourMin; tourPanel(false); },
+  tourEnd: function(){ const st = tourSt(); if (st) tourSet({i: st.i, off: true}); tourPanel(); },
+  tourFinish: function(b){
+    if (b.dataset.del === '1') { const ids = S.tasks.filter(t => t.tour && t.owner === S.me).map(t => t.id); S.tasks = S.tasks.filter(t => ids.indexOf(t.id) < 0); }
+    tourSet({done: true, off: true}); tourPanel(); save(); render(); toast(b.dataset.del === '1' ? 'The walkthrough tasks are deleted.' : 'Walkthrough finished.');
+  }
+});
+
+/* remove a member */
+const ownedBy = id => S.tasks.filter(t => t.owner === id && !t.deleted && !t.draft && !t.req);
+function removeMemberLocal(id, mode, to){
+  const reqs = S.tasks.filter(r => r.req && r.owner !== id && r.asg && r.asg.to === id).map(r => r.id);
+  S.tasks.forEach(function(t){ if (t.grp && t.grp.length) t.grp = t.grp.filter(x => reqs.indexOf(x) < 0); });
+  S.tasks = S.tasks.filter(r => reqs.indexOf(r.id) < 0);
+  S.tasks.forEach(function(t){ if (t.owner !== id && t.asg && t.asg.to === id) t.asg = null; });
+  if (mode === 'reassign' && to) {
+    S.tasks.forEach(function(t){
+      if (t.owner !== id) return;
+      if (t.asg) { if (t.asg.to === to) t.asg = null; else if (t.asg.by === id) t.asg.by = to; }
+      t.owner = to;
+    });
+  } else S.tasks = S.tasks.filter(t => t.owner !== id);
+  S.lists = (S.lists || []).filter(l => l.owner !== id);
+  S.reflections = (S.reflections || []).filter(r => r.userId !== id);
+  Object.keys(S.plans || {}).forEach(k => { if (k.split('|')[0] === id) delete S.plans[k]; });
+  Object.keys(S.days || {}).forEach(k => { if (k.split('|')[0] === id) delete S.days[k]; });
+  S.users = S.users.filter(u => u.id !== id);
+}
+Object.assign(acts, {
+  rmMember: function(b){
+    const u = user(b.dataset.id); if (!u || !isLead() || u.id === S.me) return;
+    openModal('<div class="mtype">Team</div><h2>Remove ' + esc(u.name) + ' from the team?</h2><p class="muted" style="margin:0 0 6px">They lose access to the team and cannot sign in again unless they join with the invite code. This cannot be undone.</p>' +
+      '<div class="actions"><button type="button" class="btn" data-act="modalOff">Cancel</button><button type="button" class="btn" style="border-color:var(--bad);color:var(--bad)" data-act="rmStep2" data-id="' + u.id + '">Continue</button></div>');
+    $('#modal').classList.add('center');
+  },
+  rmStep2: function(b){
+    const u = user(b.dataset.id); if (!u) return;
+    const own = ownedBy(u.id), open = own.filter(t => !t.done).length, others = S.users.filter(x => x.id !== u.id);
+    openModal('<div class="mtype">Team</div><h2>Last check</h2><p class="muted" style="margin:0 0 10px">' + esc(u.name) + ' has ' + own.length + (own.length === 1 ? ' task' : ' tasks') + ' (' + open + ' open). Tasks other people assigned to ' + esc(u.name) + ' lose their Assigned to pill.</p>' +
+      (own.length ? '<fieldset class="rmopt"><legend>What happens to their tasks</legend><label><input type="radio" name="rm-mode" value="delete"> Delete all of them</label>' +
+        '<label><input type="radio" name="rm-mode" value="reassign"> Give them to <select id="rm-to" class="chipsel">' + others.map(x => '<option value="' + x.id + '">' + esc(x.name) + '</option>').join('') + '</select></label></fieldset>' : '') +
+      '<label class="fld" style="margin-top:12px">Type ' + esc(u.name) + ' to confirm<input id="rm-name" autocomplete="off" data-inp="rmCheck" data-name="' + esc(u.name) + '"></label>' +
+      '<div class="actions"><button type="button" class="btn" data-act="modalOff">Cancel</button><button type="button" id="rm-go" class="btn" style="background:var(--bad);border-color:var(--bad);color:#fff" data-act="rmDo" data-id="' + u.id + '" disabled>Remove ' + esc(u.name) + '</button></div>');
+    $('#modal').classList.add('center');
+  },
+  rmDo: async function(b){
+    const u = user(b.dataset.id); if (!u || !isLead() || u.id === S.me) return;
+    const inp0 = $('#rm-name'); if (!inp0 || inp0.value.trim().toLowerCase() !== u.name.trim().toLowerCase()) return;
+    const own = ownedBy(u.id), chk = document.querySelector('input[name=rm-mode]:checked');
+    const mode = own.length ? (chk ? chk.value : '') : 'delete', to = ($('#rm-to') || {}).value;
+    if (!mode) { toast('Choose what happens to their tasks.'); return; }
+    b.disabled = true;
+    if (CLOUD) {
+      const r = await SB.rpc('remove_member', {p_user: u.id, p_mode: mode, p_to: mode === 'reassign' ? to : null});
+      if (r.error) { b.disabled = false; toast(r.error.message); return; }
+      try { await hydrateData(); } catch(e) {}
+    } else { removeMemberLocal(u.id, mode, to); save(); }
+    closeModal(); toast(u.name + ' was removed.'); render();
+  }
+});
+inp.rmCheck = function(el){ const g = $('#rm-go'); if (g) g.disabled = el.value.trim().toLowerCase() !== String(el.dataset.name || '').trim().toLowerCase(); };
+
+const SESSION_MS = 24 * 3600 * 1000;
+function stampLogin(){ try { localStorage.setItem('sterling-login-at', String(Date.now())); } catch(e) {} }
+function sessionExpired(){
+  try { const at = +localStorage.getItem('sterling-login-at'); if (!at) { stampLogin(); return false; } return Date.now() - at > SESSION_MS; } catch(e) { return false; }
+}
 async function startCloud(){
   $('#auth').hidden = false; $('#auth').innerHTML = '<div class="authbox"><p class="authhint">Loading…</p></div>';
   if (!window.supabase) { try { await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js'); } catch(e) {} }
@@ -5591,10 +5810,11 @@ async function startCloud(){
   SB = window.supabase.createClient(CFG.url, CFG.key, {auth: {persistSession: true, autoRefreshToken: true}});
   const recovering = /type=recovery/.test(location.hash || '');
   SB.auth.onAuthStateChange(function(ev){ if (ev === 'PASSWORD_RECOVERY') { ui.authTab = 'newpw'; ui.authErr = ''; S.signedIn = false; showAuth(); } });
-  const sess = (await SB.auth.getSession()).data.session;
+  let sess = (await SB.auth.getSession()).data.session;
+  if (sess && sessionExpired()) { try { await SB.auth.signOut(); } catch(e) {} sess = null; ui.authInfo = 'You were signed out after 24 hours. Sign in again.'; }
   if (recovering) { ui.authTab = 'newpw'; showAuth(); }
   else if (sess) { await enterCloud(); } else showAuth();
-  document.addEventListener('visibilitychange', function(){ if (!document.hidden) refreshCloud(); });
+  document.addEventListener('visibilitychange', function(){ if (!document.hidden) { if (S.signedIn && sessionExpired()) { cloudSignOut().then(function(){ ui.authInfo = 'You were signed out after 24 hours. Sign in again.'; showAuth(); }); return; } refreshCloud(); } });
   setInterval(refreshCloud, 120000);
 }
 
@@ -5645,7 +5865,7 @@ async function cloudSignIn(f){
   const r = await SB.auth.signInWithPassword({email: e, password: pw});
   btn.disabled = false;
   if (r.error) { authErr(/invalid login/i.test(r.error.message) ? 'Wrong email or password.' : r.error.message); return; }
-  S.view = 'today'; await enterCloud();
+  stampLogin(); S.view = 'today'; await enterCloud();
 }
 async function cloudSignUp(f){
   const n = f.querySelector('#au-n').value.trim(), e = f.querySelector('#au-e').value.trim().toLowerCase(), pw = f.querySelector('#au-p').value, c = f.querySelector('#au-c').value.trim();
@@ -5661,12 +5881,12 @@ async function cloudSignUp(f){
   btn.disabled = false;
   if (r.error) { authErr(/invalid login/i.test(r.error.message) ? 'This email already has an account. Use Sign in.' : r.error.message); return; }
   if (!r.data.session) { ui.authTab = 'in'; ui.authErr = ''; showAuth(); authErr('Check your email and confirm your address, then sign in.'); return; }
-  await enterCloud();
+  stampLogin(); await enterCloud();
 }
 async function cloudSignOut(){
   clearTimeout(cloud.timer);
   try { await flush(); } catch(e) {}
-  await SB.auth.signOut();
+  await SB.auth.signOut(); try { localStorage.removeItem('sterling-login-at'); } catch(e) {}
   S = emptyState(); cloud.synced = {}; cloud.meta = {}; cloud.loaded = false; ui.authTab = 'in'; ui.authErr = '';
   document.body.classList.remove('cloud'); closeModal(); showAuth();
 }
@@ -5779,7 +5999,7 @@ function teamCard(){
     const lead = u.role === 'Team lead', pos = posOf(u);
     return '<div class="trow"><span style="min-width:0"><b>' + esc(u.name) + '</b>' + (u.id === S.me ? ' <span class="muted">(you)</span>' : '') +
       '<span class="muted" style="display:block;font-size:.7812rem;overflow-wrap:anywhere">' + esc(emailOf(u)) + (pos ? ' · ' + esc(pos) : '') + '</span></span>' +
-      '<select class="chipsel" data-chg="setRole" data-id="' + u.id + '" aria-label="Role of ' + esc(u.name) + '"><option value="member"' + (lead ? '' : ' selected') + '>Member</option><option value="lead"' + (lead ? ' selected' : '') + '>Team lead</option></select></div>';
+      '<select class="chipsel" data-chg="setRole" data-id="' + u.id + '" aria-label="Role of ' + esc(u.name) + '"><option value="member"' + (lead ? '' : ' selected') + '>Member</option><option value="lead"' + (lead ? ' selected' : '') + '>Team lead</option></select>' + (u.id === S.me ? '' : '<button type="button" class="btn small quiet" data-act="rmMember" data-id="' + u.id + '" aria-label="Remove ' + esc(u.name) + ' from the team">Remove</button>') + '</div>';
   }).join('');
   return '<section class="card side" id="team-card">' + scopeHead('People and roles', 'Team leads only') + rows + '</section>';
 }
