@@ -332,12 +332,15 @@ body.is-dragging{user-select:none;-webkit-user-select:none;cursor:grabbing}
 .ghead>.c1{flex:1 1 0;min-width:0}
 .ghead>.row{flex:none;align-self:center}
 .presence{display:inline-flex;align-items:center;margin-right:10px;vertical-align:middle}
-.prs{position:relative;display:inline-grid;place-items:center;width:28px;height:28px;margin-left:-6px;border-radius:50%;background:var(--soft);color:var(--ink);border:2px solid var(--bg);box-shadow:0 0 0 1.5px var(--good);font:700 .75rem var(--font-body,inherit);cursor:default}
+.prs{display:inline-flex;align-items:center;gap:7px;margin-left:6px;padding:3.4px 11px;border-radius:999px;border:1px solid var(--good);color:var(--good);background:transparent;font-size:.75rem;font-weight:600;white-space:nowrap;cursor:default}
 .prs:first-child{margin-left:0}
-.prs.idle{opacity:.45;box-shadow:0 0 0 1.5px var(--line)}
-.prs.more{background:var(--bg);color:var(--muted);box-shadow:0 0 0 1.5px var(--line)}
-body.foil .prs{background:linear-gradient(135deg,#FFE9A8,#FFC2DD 50%,#BFE7F5);box-shadow:0 0 0 1.5px #14213D}
-body.foil .prs.idle{box-shadow:0 0 0 1.5px var(--line)}
+.prs i{width:8px;height:8px;border-radius:50%;background:var(--good);flex:none}
+.prs.off{border-color:var(--line);color:var(--muted)}
+.prs.off i{background:var(--muted);opacity:.6}
+.prs.more{border-color:var(--line);color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.prs.on{animation:prsblink 1.6s steps(1,end) infinite}.prs.on i{animation:prsdot 1.6s steps(1,end) infinite}
+@keyframes prsblink{0%,100%{border-color:var(--good);background:color-mix(in srgb,var(--good) 18%,transparent)}50%{border-color:var(--line);background:transparent}}
+@keyframes prsdot{0%,100%{opacity:1}50%{opacity:.2}}}
 @media (max-width:760px){.presence{display:none}}
 .envpill{background:transparent;font-family:inherit;cursor:pointer;display:inline-block;font-size:.75rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:3.4px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
 .authbox .envpill.auth{align-self:flex-start;margin-top:-14px;cursor:default}
@@ -584,6 +587,9 @@ h2.dp{margin:0 0 6px;font-size:.75rem;font-weight:600;letter-spacing:.06em;text-
 .hrsval{all:unset;cursor:text;padding:1px 4px;border-radius:4px;font-variant-numeric:tabular-nums}
 .hrsval:hover{background:var(--soft)}
 .hrsval:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.pfft{display:flex;align-items:center;gap:4px;margin-top:16px;padding-top:10px;border-top:1px solid var(--line);grid-column:1/-1}
+.pfft .tplabel{width:auto;margin:0;padding:6px 10px;min-height:0}
+.pfft .pfsave{color:var(--ink);font-weight:700}
 .pfout{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);display:flex;justify-content:flex-start}
 .task .rowact{opacity:0;pointer-events:none}
 .task:hover .rowact,.task:focus-within .rowact{opacity:1;pointer-events:auto}
@@ -5800,43 +5806,45 @@ function introCheck(){
 }
 
 /* Who is online (Supabase Realtime presence in the cloud version, sample people in the demo) */
-const pres = {ch: null, state: {}, last: Date.now(), idle: false, timer: null};
-function presKey(){ return CLOUD ? pres.state : null; }
+const pres = {ch: null, state: {}, gone: {}, seen: {}, timer: null};
+const PRES_KEEP = 5 * 60000;
 function presList(){
   if (!S || !S.signedIn || !me()) return [];
-  const out = [];
-  if (CLOUD) { Object.keys(pres.state).forEach(function(id){ if (id === S.me) return; const u = user(id); if (!u) return; const m = (pres.state[id] || [])[0] || {}; out.push({u: u, idle: !!m.idle}); }); }
-  else { S.users.filter(u => u.id !== S.me).slice(0, 4).forEach(function(u, i){ out.push({u: u, idle: i === 2}); }); }
-  return out.sort((a, b) => (a.idle - b.idle) || a.u.name.localeCompare(b.u.name));
+  const out = [], now = Date.now();
+  if (CLOUD) {
+    Object.keys(pres.state).forEach(function(id){ if (id === S.me) return; const u = user(id); if (u) out.push({u: u, on: true}); });
+    Object.keys(pres.gone).forEach(function(id){ if (pres.state[id]) return; if (now - pres.gone[id] > PRES_KEEP) { delete pres.gone[id]; return; } const u = user(id); if (u) out.push({u: u, on: false}); });
+  } else { S.users.filter(u => u.id !== S.me).slice(0, 3).forEach(function(u, i){ out.push({u: u, on: i < 2}); }); }
+  return out.sort((a, b) => (b.on - a.on) || a.u.name.localeCompare(b.u.name));
 }
 function presRender(){
   const el = document.getElementById('presence'); if (!el) return;
   const L = presList();
-  if (!L.length) { el.hidden = true; el.innerHTML = ''; return; }
-  const sig = L.map(x => x.u.id + (x.idle ? 'i' : 'a')).join(',');
+  if (!L.length) { el.hidden = true; el.innerHTML = ''; el.dataset.sig = ''; return; }
+  const sig = L.map(x => x.u.id + x.u.name + (x.on ? 'a' : 'g')).join(',');
   if (el.dataset.sig === sig) return;
   el.dataset.sig = sig; el.hidden = false;
-  const max = 5;
-  el.innerHTML = L.slice(0, max).map(x => '<span class="prs' + (x.idle ? ' idle' : '') + '" title="' + esc(x.u.name) + (x.idle ? ' (away)' : ' (in the app)') + '" aria-label="' + esc(x.u.name) + (x.idle ? ', away' : ', in the app') + '">' + esc(String(x.u.name).charAt(0).toUpperCase()) + '</span>').join('') +
+  const max = 3;
+  el.innerHTML = L.slice(0, max).map(x => '<span class="prs ' + (x.on ? 'on' : 'off') + '" title="' + esc(x.u.name) + (x.on ? ' is in the app' : ' left the app') + '"><i aria-hidden="true"></i>' + esc(x.u.name) + '</span>').join('') +
     (L.length > max ? '<span class="prs more" title="' + esc(L.slice(max).map(x => x.u.name).join(', ')) + '">+' + (L.length - max) + '</span>' : '');
 }
 function presStart(){
   if (!CLOUD || !SB || !cloud.team || pres.ch) return;
   try {
     pres.ch = SB.channel('presence:' + cloud.team.id, {config: {presence: {key: cloud.uid}}});
-    pres.ch.on('presence', {event: 'sync'}, function(){ pres.state = pres.ch.presenceState(); presRender(); })
-      .subscribe(function(st){ if (st === 'SUBSCRIBED') pres.ch.track({idle: false, at: Date.now()}); });
+    pres.ch.on('presence', {event: 'sync'}, function(){
+      const next = pres.ch.presenceState();
+      Object.keys(pres.state).forEach(function(id){ if (!next[id]) pres.gone[id] = Date.now(); });
+      Object.keys(next).forEach(function(id){ delete pres.gone[id]; });
+      pres.state = next; presRender();
+    }).subscribe(function(st){ if (st === 'SUBSCRIBED') pres.ch.track({at: Date.now()}); });
   } catch(e) { pres.ch = null; return; }
-  const bump = function(){ pres.last = Date.now(); if (pres.idle) presSetIdle(false); };
-  ['pointerdown', 'keydown', 'mousemove', 'scroll', 'touchstart'].forEach(ev => document.addEventListener(ev, bump, {passive: true, capture: true}));
-  document.addEventListener('visibilitychange', function(){ if (document.hidden) presSetIdle(true); else bump(); });
-  pres.timer = setInterval(function(){ if (!pres.idle && (document.hidden || Date.now() - pres.last > 5 * 60000)) presSetIdle(true); }, 20000);
+  pres.timer = setInterval(presRender, 15000);
 }
-function presSetIdle(v){ pres.idle = v; try { if (pres.ch) pres.ch.track({idle: v, at: Date.now()}); } catch(e) {} }
 function presStop(){
   clearInterval(pres.timer); pres.timer = null;
   try { if (pres.ch) { pres.ch.untrack(); SB.removeChannel(pres.ch); } } catch(e) {}
-  pres.ch = null; pres.state = {}; presRender();
+  pres.ch = null; pres.state = {}; pres.gone = {}; presRender();
 }
 
 /* Foil reveal */
@@ -6264,8 +6272,7 @@ function profileHtml(u){
   return '<h2>Your details</h2><form data-form="profile" novalidate class="frm" style="margin-top:8px">' +
     '<label class="fld wide">Name<input id="pf-name" value="' + esc(u.name) + '" maxlength="40" autocomplete="off"></label>' +
     '<div class="fld wide"><span>Role in the app</span><strong style="display:block;margin-top:4px">' + (lead ? 'Team lead' : 'Member') + '</strong><span class="muted" style="font-size:.7812rem">' + (lead ? 'You can change goals, key results and roles.' : 'A team lead can change your role in Settings, Team.') + '</span></div>' +
-    '<div class="actions wide"><button type="button" class="btn" data-act="closeModal">Cancel</button><button type="submit" class="btn primary">Save</button></div></form>' +
-    '<div class="pfout"><button type="button" class="btn small quiet" data-act="signOut">Sign out</button></div>';
+    '<div class="pfft wide"><button type="button" class="tplabel tpnb" data-act="signOut">Sign out</button><span class="grow"></span><button type="button" class="tplabel tpnb" data-act="closeModal">Cancel</button><button type="submit" class="tplabel tpnb pfsave">Save</button></div></form>';
 }
 Object.assign(acts, {
   openProfile: function(){ const u = me(); if (!u) return; openModal(profileHtml(u)); $('#modal').classList.add('center'); const i = $('#pf-name'); if (i) i.focus(); }
