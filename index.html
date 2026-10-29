@@ -317,6 +317,8 @@ body.qafocus header.top,body.qafocus #tabs,body.qafocus #main>*:not(.qawrap):not
 .grip{background:none;border:0;color:var(--muted);cursor:grab;padding:0;width:24px;height:28px;line-height:1;touch-action:none;letter-spacing:-3px;font-size:.875rem;border-radius:6px;user-select:none;flex:none}
 .grip:hover{color:var(--ink);background:var(--soft)}
 .dragging{opacity:.35}
+.ghost.fl,body.foil .ghost.fl{position:fixed!important;left:0!important;top:0!important;z-index:90!important;margin:0!important;display:flex!important;background:none!important;border:0!important;padding:0!important;box-shadow:none!important;width:236px!important;transform-origin:0 0;filter:drop-shadow(0 14px 18px rgba(20,33,61,.4));opacity:.95}
+body.is-dragging{user-select:none;-webkit-user-select:none;cursor:grabbing}
 .ghost{position:fixed;left:0;top:0;z-index:90;pointer-events:none;background:var(--surface);border:1px solid var(--ink)!important;border-radius:10px;padding:8px 10px!important;box-shadow:0 8px 24px rgba(0,0,0,.28);margin:0;list-style:none}
 body.is-dragging{user-select:none;-webkit-user-select:none;cursor:grabbing}
 .ins-b{box-shadow:0 -2px 0 0 var(--ink)}
@@ -355,7 +357,16 @@ body.marq{user-select:none;-webkit-user-select:none}
 .kpbox{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:14px;width:min(680px,100%);max-height:min(74vh,660px);display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(0,0,0,.3)}
 .kpsearch{margin:12px;font:inherit;font-size:.9375rem;padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--ink)}
 .kplist{overflow:auto;padding:0 8px 12px}
-.kpg{font-weight:600;font-size:.8125rem;color:var(--muted);padding:12px 8px 4px;overflow-wrap:anywhere}
+.kpg{display:flex;gap:10px;align-items:baseline;margin:14px 0 4px;padding:8px 10px;border-radius:8px;background:var(--soft);border-left:4px solid var(--accent,var(--ink));overflow-wrap:anywhere}
+.kpgl{flex:none;font:700 .6875rem var(--font-mono,monospace);letter-spacing:.12em;text-transform:uppercase;color:var(--ink);background:var(--surface);border:1px solid var(--ink);border-radius:5px;padding:2px 7px}
+.kpgt{font-weight:700;font-size:.875rem;color:var(--ink)}
+.kphint{margin:-4px 12px 2px;font-size:.78rem;color:var(--muted)}
+.kpo{display:flex!important;gap:10px;align-items:baseline;margin-left:18px;width:calc(100% - 18px)!important;border-left:2px solid var(--line)!important;border-radius:0 8px 8px 0!important}
+.kpkl{flex:none;font:700 .6875rem var(--font-mono,monospace);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:2px 6px}
+.kpkt{flex:1;min-width:0}
+.kpq{flex:none;font-size:.72rem;color:var(--muted)}
+.kpo.on .kpkl{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+select:has(optgroup):not(.selsel){appearance:none;-webkit-appearance:none;cursor:pointer;padding-right:34px;background-repeat:no-repeat;background-position:right 10px center;background-size:16px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M4 7h16M4 12h16M4 17h10'/%3E%3C/svg%3E")}
 .kpo{display:block;width:100%;text-align:left;background:none;border:0;border-radius:8px;padding:8px;font:inherit;font-size:.9062rem;color:var(--ink);cursor:pointer;overflow-wrap:anywhere}
 .kpo:hover,.kpo.on{background:var(--soft)}
 .kpo.none{color:var(--muted)}
@@ -1839,7 +1850,7 @@ function tpHtml(t){
     (inb ? '<div class="tmeta dates" style="margin-left:28px">' + inb + '</div>' : '') +
     tpSubs(t, own) + '<hr class="tpsep">' + (own ? ownFacts(t) + '<hr class="tpsep"><div class="tpnotes"><button type="button" class="tplabel tpnb" data-act="notesOpen" data-id="' + t.id + '" aria-expanded="' + (t.desc || ui.nOpen === t.id ? 'true' : 'false') + '">Add a note</button>' + (t.desc || ui.nOpen === t.id ? '<textarea id="nt-' + t.id + '" class="tpnote tplabel" data-chg="descSet" data-id="' + t.id + '" rows="2" maxlength="2000" placeholder="Write a note" aria-label="Note">' + esc(t.desc || '') + '</textarea>' : '') + '</div>' : roFacts(t)) +
     (!own && asgLocked(t) && t.owner === S.me ? '<div class="tpft"><button type="button" class="btn small quiet" data-act="asgClear" data-id="' + t.id + '">Remove from my list</button></div>' : '') +
-    (!own && t.owner !== S.me && canEdit(t) ? '<div class="tpft2"><button type="button" class="btn small" data-act="edit" data-id="' + t.id + '">Edit</button></div>' : '') + '</div>';
+    '</div>';
 }
 function kpHtml(k){
   const g = goal(k.goalId), pr = krProgress(k);
@@ -1917,7 +1928,8 @@ function krOptions(sel, req){
   S.goals.filter(g => !g.deleted && !g.archived).forEach(function(g){
     const ks = S.krs.filter(k => k.goalId === g.id && !k.deleted);
     if (!ks.length) return;
-    out += '<optgroup label="' + esc((goalNum(g) ? goalNum(g) + '  ' : '') + g.title) + '">' + ks.map(k => '<option value="' + k.id + '"' + (k.id === sel ? ' selected' : '') + '>' + esc((krNum(k) ? krNum(k) + '  ' : '') + k.title) + ' (' + qLabel(k.quarter) + ')</option>').join('') + '</optgroup>';
+    const gn = goalNum(g);
+    out += '<optgroup label="' + esc((gn ? 'Goal ' + gn + '  ' : '') + g.title) + '" data-gn="' + esc(gn) + '" data-gt="' + esc(g.title) + '">' + ks.map(k => '<option value="' + k.id + '"' + (k.id === sel ? ' selected' : '') + ' data-kn="' + esc(krNum(k)) + '" data-kt="' + esc(k.title) + '" data-kq="' + esc(qLabel(k.quarter)) + '" data-gn="' + esc(gn) + '">' + esc((gn ? 'Goal ' + gn + ' › ' : '') + 'KR ' + (krNum(k) ? krNum(k) + '  ' : '') + k.title) + ' (' + qLabel(k.quarter) + ')</option>').join('') + '</optgroup>';
   });
   return out;
 }
@@ -2759,7 +2771,7 @@ function viewModal(t){
     row('Result note', t.owner === S.me && t.note ? esc(t.note) : '') +
     row('Created', esc(t.createdAt) + (t.createdBy ? ' by ' + esc((user(t.createdBy) || {}).name || '') : '')) +
     '</div><div class="actions"><span>' + '' + '</span>' +
-    '<span class="row"><button class="btn" data-act="closeModal">Close</button>' + (ok ? '<button class="btn primary" data-act="edit" data-id="' + t.id + '">Edit</button>' : '') + '</span></div>');
+    '<span class="row"><button class="btn" data-act="closeModal">Close</button></span></div>');
 }
 function doneModal(t){
   openModal('<h2>Log impact</h2><p style="margin:0 0 10px">' + esc(t.title) + '</p>' +
@@ -4807,13 +4819,9 @@ Object.assign(acts, {
     if (!pop.hidden && pop.dataset.for === key) { closePop(); return; }
     pop.dataset.for = key; pop.style.width = 'min(640px, calc(100vw - 16px))';
     pop.innerHTML = '<div class="pophd">Key result: ' + esc(t.title.length > 40 ? t.title.slice(0, 38) + '…' : t.title) + '</div>' +
-      '<label class="fld">Which key result is this for?<select id="pop-kr" style="width:100%" data-chg="krSetInp" data-id="' + t.id + '">' + krOptions(t.krId || '', true).replace('Choose a key result', '—') + '</select></label>';
-    pop.hidden = false;
-    const r = b.getBoundingClientRect(), w = pop.offsetWidth, h = pop.offsetHeight;
-    let left = Math.min(Math.max(8, r.left), window.innerWidth - w - 8);
-    let top = r.bottom + 6; if (top + h > window.innerHeight - 8) top = Math.max(8, r.top - h - 6);
-    pop.style.left = (left + window.scrollX) + 'px'; pop.style.top = (top + window.scrollY) + 'px';
-    const f = pop.querySelector('select'); if (f) f.focus();
+      '<label class="fld">Which key result is this for?<select id="pop-kr" style="width:100%" data-chg="krSetInp" data-id="' + t.id + '">' + krOptions(t.krId || '', true).replace('Choose a key result', 'No key result') + '</select></label>';
+    pop.hidden = true;
+    const f = pop.querySelector('select'); if (f) openKrPicker(f);
   },
   datePop: function(b){
     const t = byId(b.dataset.id), pop = $('#pop'), k = b.dataset.kind; if (!t || !pop) return;
@@ -4945,7 +4953,10 @@ function startDrag(e){
   const r = src.getBoundingClientRect();
   const gh = src.cloneNode(true);
   gh.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
-  gh.removeAttribute('data-item'); gh.classList.add('ghost'); gh.style.width = r.width + 'px';
+  gh.removeAttribute('data-item'); gh.classList.add('ghost');
+  drag.gz = 1;
+  if (drag.card) { let z = 1, n = drag.el; while (n && n.nodeType === 1) { z *= parseFloat(getComputedStyle(n).zoom) || 1; n = n.parentElement; } drag.gz = z; }
+  else gh.style.width = r.width + 'px';
   document.body.appendChild(gh);
   drag.ghost = gh; drag.dx = e.clientX - r.left; drag.dy = e.clientY - r.top; drag.on = true;
   drag.el.classList.add('dragging'); document.body.classList.add('is-dragging');
@@ -5008,11 +5019,18 @@ document.addEventListener('pointerdown', function(e){
   drag = {kind: item.dataset.item, id: item.dataset.id, el: item, x0: e.clientX, y0: e.clientY, lx: e.clientX, ly: e.clientY, on: false, pid: e.pointerId, target: null};
   try { g.setPointerCapture(e.pointerId); } catch(err) {}
 });
+document.addEventListener('pointerdown', function(e){
+  if (drag || !foilOn() || (e.pointerType === 'mouse' && e.button !== 0) || e.pointerType === 'touch') return;
+  const li = e.target.closest && e.target.closest('li.task.fl[data-item="task"]'); if (!li || li.closest('#modal, .setov')) return;
+  if (e.target.closest('input, select, textarea, a')) return;
+  const t = byId(li.dataset.id); if (!t || t.owner !== S.me || t.done) return;
+  drag = {kind: 'task', id: li.dataset.id, el: li, card: true, x0: e.clientX, y0: e.clientY, lx: e.clientX, ly: e.clientY, on: false, pid: e.pointerId, target: null};
+}, true);
 document.addEventListener('pointermove', function(e){
   if (!drag || e.pointerId !== drag.pid) return;
   if (!drag.on) { if (Math.hypot(e.clientX - drag.x0, e.clientY - drag.y0) < 5) return; startDrag(e); }
   drag.lx = e.clientX; drag.ly = e.clientY;
-  drag.ghost.style.transform = 'translate(' + (e.clientX - drag.dx) + 'px,' + (e.clientY - drag.dy) + 'px)';
+  drag.ghost.style.transform = 'translate(' + (e.clientX - drag.dx) + 'px,' + (e.clientY - drag.dy) + 'px)' + (drag.gz && drag.gz !== 1 ? ' scale(' + drag.gz + ')' : '');
   clearMarks(); drag.target = dropInfo(drag, e.clientX, e.clientY);
 });
 document.addEventListener('pointerup', function(e){ if (drag && e.pointerId === drag.pid) finishDrag(false); });
@@ -5057,11 +5075,11 @@ function openKrPicker(sel){
   const cur = sel.value, kids = Array.from(sel.children);
   let html = '';
   kids.forEach(function(c){
-    if (c.tagName === 'OPTGROUP') html += '<div class="kpg">' + esc(c.label) + '</div>' + Array.from(c.children).map(o => '<button type="button" class="kpo' + (o.value === cur ? ' on' : '') + '" data-v="' + esc(o.value) + '">' + esc(o.textContent) + '</button>').join('');
+    if (c.tagName === 'OPTGROUP') html += '<div class="kpg"><span class="kpgl">Goal' + (c.dataset.gn ? ' ' + esc(c.dataset.gn) : '') + '</span><span class="kpgt">' + esc(c.dataset.gt || c.label) + '</span></div>' + Array.from(c.children).map(o => '<button type="button" class="kpo' + (o.value === cur ? ' on' : '') + '" data-v="' + esc(o.value) + '"><span class="kpkl">KR' + (o.dataset.kn ? ' ' + esc(o.dataset.kn) : '') + '</span><span class="kpkt">' + esc(o.dataset.kt || o.textContent) + '</span>' + (o.dataset.kq ? '<span class="kpq">' + esc(o.dataset.kq) + '</span>' : '') + '</button>').join('');
     else html += '<button type="button" class="kpo none' + (c.value === cur ? ' on' : '') + '" data-v="' + esc(c.value) + '">' + esc(c.textContent) + '</button>';
   });
   const w = document.createElement('div'); w.id = 'kpick'; w.className = 'kpick';
-  w.innerHTML = '<div class="kpbox" role="dialog" aria-label="Choose a key result"><input class="kpsearch" id="kp-q" placeholder="Search key results" autocomplete="off"><div class="kplist">' + html + '</div></div>';
+  w.innerHTML = '<div class="kpbox" role="dialog" aria-label="Choose a key result"><input class="kpsearch" id="kp-q" placeholder="Search goals and key results" autocomplete="off"><p class="kphint">Pick the <b>key result</b> this task serves. Its <b>goal</b> is shown above it.</p><div class="kplist">' + html + '</div></div>';
   document.body.appendChild(w);
   window.__kpSel = sel; window.__kpAt = Date.now();
   const q = $('#kp-q'); if (q) q.focus();
