@@ -1798,7 +1798,7 @@ function nextKrNum(g){
   const n = Math.max(g.kseq || 0, mx) + 1; g.kseq = n; return n;
 }
 function ensureNums(){
-  if (CLOUD) return false;
+  if (CLOUD && !isLead()) return false;
   let ch = false;
   S.goals.forEach(function(g){ if (!g.num) { g.num = nextGoalNum(g.year); ch = true; } });
   S.krs.forEach(function(k){ if (!k.num) { const g = goal(k.goalId); if (g) { k.num = nextKrNum(g); ch = true; } } });
