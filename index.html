@@ -1202,8 +1202,10 @@ body.foil .qag.qfoil{display:inline-block;background:linear-gradient(100deg,#FFA
 #tour .tr-w{font-size:.75rem}
 #tour .trl{margin:0;padding-left:18px}
 #tour .trl li{margin:3px 0}
-.tour-hl{outline:3px solid #FF6FB5!important;outline-offset:3px;border-radius:10px;position:relative;z-index:5}
-@media (prefers-reduced-motion:no-preference){.tour-hl{animation:tourpulse 1.6s ease-in-out infinite}@keyframes tourpulse{50%{outline-color:#FFC300;outline-offset:6px}}}
+#tourspot{position:fixed;inset:0;z-index:66;background:rgba(0,0,0,.22);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);pointer-events:none}
+#tourring{position:fixed;z-index:67;border:3px solid #FF6FB5;box-shadow:0 0 0 2px #fff;pointer-events:none}
+#tour .tr-do{margin:0 0 6px;font-weight:500}
+#tour .trl{margin:0;padding-left:18px}#tour .trl li{margin:3px 0}
 body.foil #tour{border:2px solid transparent;background:linear-gradient(var(--surface),var(--surface)) padding-box,linear-gradient(135deg,#FFC300,#FF6FB5,#7AD7F0,#B8F28B) border-box}
 @media (max-width:560px){#tour{width:calc(100vw - 32px);bottom:max(8px,env(safe-area-inset-bottom,0px))}#tour .tr-b{max-height:24vh}}
 .rintro h2{margin:0 0 8px}.rintro h3{margin:14px 0 4px;font-size:.9375rem}.rintro ul{margin:0;padding-left:18px}.rintro li{margin:5px 0}
@@ -5664,31 +5666,31 @@ const tourT = () => { const st = tourSt(); return st && st.tid ? byId(st.tid) : 
 const newMine = () => mineT().find(t => (ui.tb.ids || []).indexOf(t.id) < 0);
 const FOILISH = () => foilOn();
 const TOUR = [
-  {k: 'today', nav: 'today', tg: '#tabs [data-view=today]', t: 'Today', next: 1, b: 'Today is your working day. The arrows move between days, and Day, Week and Month change the range. Planned tasks sit in the middle, anything you did not finish shows above them, and Day planning on the right is where you set your hours per category.'},
-  {k: 'style', tg: 'header.top .brandwrap', t: 'Foil and Sterling', b: 'The logo is a switch. Foil turns every task into a trading card, Sterling is the plain list. Your choice is saved for your account and the sign-in screen has the same switch. Open the menu and pick the look you want.', enter: () => { ui.tourMenu = false; }, done: () => !!ui.tourMenu && !$('#stylemenu')},
-  {k: 'add', nav: 'today', tg: '#main [data-act=quick]', t: 'Create a task', b: 'Press Add task and type a title. A task window opens; press Enter to create the task, then close the window with Esc. The task is planned for the day you are looking at.', done: () => !!newMine() && !ui.tp, after: function(st){ const t = newMine(); if (t) { t.tour = true; st.tid = t.id; } }},
-  {k: 'pack', nav: 'today', show: () => FOILISH() && !(S.foil && S.foil.opened && S.foil.opened[TODAY]), tg: '#main [data-act=fxOpen]', t: 'Open today\'s pack', b: 'Each day is a pack. Open it to rip the pack and turn its cards over one at a time. Rarity is a random draw: Base 60%, Rare 25%, Foil 12%, Legend 3%. It never depends on priority and never changes. Packs with more than 7 cards show 7 and open the rest at once.', done: () => !!(S.foil && S.foil.opened && S.foil.opened[TODAY])},
-  {k: 'cards', show: FOILISH, next: 1, t: 'Cards', b: 'Click a card to turn it over to the plain back. Double-click lifts it to the middle to edit. Tasks you add after the pack is open arrive in the Mailbox sealed and can be flipped after about a minute. A task you assigned to someone shows a Sent to stamp.'},
-  {k: 'open', tg: () => tourT() ? '#main li[data-id="' + tourT().id + '"]' : '', t: 'Open your task', b: 'Click the task you just made. In Foil, click it once to turn the card over and twice to open it. The task window holds every field: Planned, Deadline, Goal, Priority, List and Assigned. An empty field shows a plus.', done: () => !!tourT() && ui.tp === tourT().id},
-  {k: 'fields', tg: '#modal .sheet', t: 'Priority and goal', b: 'Pick a priority and, if the team has goals, a goal and key result. Goals and key results carry numbers such as 1.4 so everyone names them the same way.', enter: () => { ui.tb.pr = tourT() && tourT().priority; }, done: () => { const t = tourT(); return !!t && (t.krId || t.priority !== ui.tb.pr); }},
-  {k: 'deadline', tg: '#modal .sheet', t: 'Set a deadline', b: 'Set a deadline for today or tomorrow. In Foil a card due today, tomorrow or overdue gets a round stamp with the date and the rest of the card dims. In Sterling the deadline shows in the task row.', done: () => { const t = tourT(); return !!t && !!t.deadline; }},
-  {k: 'close', t: 'Close the window', b: 'Press Esc or the close button. Changes save by themselves. The pill at the top shows Saving, Saved or an error, and the build number next to it opens the release notes.', done: () => !ui.tp},
-  {k: 'seal', tg: () => tourT() ? '#main li[data-id="' + tourT().id + '"]' : '', nav: 'today', t: 'Finish the task', b: 'Tick the task. In Foil it is sealed with a stamp and moves to My Collection in Settings, grouped by rarity. In Sterling it is checked off.', done: () => { const t = tourT(); return !!t && t.done; }},
-  {k: 'backlog', tg: '#tabs [data-view=backlog]', t: 'Backlog', b: 'Open Backlog. Tasks without a date live here. Use lists to group them and sections to split a list. In Foil the cards stay full and small, side by side.', done: () => S.view === 'backlog'},
-  {k: 'list', show: () => S.view === 'backlog', tg: '#main [data-act=newList]', t: 'Create a list', enter: () => { ui.tb.lists = S.lists.length; }, b: 'Press New list, name it and save. Then open it and press Add section to split it. Sections can be dragged to reorder, and List or Board changes the view.', done: () => S.lists.length > ui.tb.lists},
-  {k: 'sort', tg: '#main .sortsel', t: 'Sort', enter: () => { ui.tb.gs = ui.gsort || ''; }, b: 'The Sort menu is on Today, Backlog, My Collection and key results. Priority, Soon (closest planned date), Deadline (closest first), Rarity, Newest and Title. One choice applies to every tab. Try one.', done: () => (ui.gsort || '') !== ui.tb.gs},
-  {k: 'goals', tg: '#tabs [data-view=goals]', t: 'Goals', b: 'Open Goals. Each goal has key results numbered 1.1, 1.2 and so on. You set your own status, quarter, notes and reflections. The Review button gathers what you wrote, oldest first, ready to copy for a review.', done: () => S.view === 'goals'},
-  {k: 'goalsLead', only: 'lead', next: 1, t: 'Goals as a team lead', b: 'Only team leads create, rename and delete goals and key results. Members see the names and add their own notes. Deleting a goal sends its tasks to Need review.'},
-  {k: 'assign', show: () => S.users.length > 1, t: 'Assign a task', enter: () => { ui.tb.asg = S.tasks.filter(t => t.asg || (t.grp && t.grp.length)).map(t => t.id); }, b: 'Make a second task, open it and press the plus next to Assigned, then pick a teammate. In the live version they receive it for real, so choose someone who expects it, or skip this step.', done: () => S.tasks.some(t => t.owner === S.me && (t.asg || (t.grp && t.grp.length)) && ui.tb.asg.indexOf(t.id) < 0)},
-  {k: 'asgInfo', show: () => S.users.length > 1, next: 1, t: 'What the pills mean', b: 'A dotted Assigned to pill means the person has not answered yet. A solid pill carries the answer, such as Maya accepted. The person gets the task at the top of their Need review tab and answers Accept, Decline or Suggest someone else. After they accept, they own it and you only see its status.'},
-  {k: 'team', tg: '#tabs [data-view=team]', t: 'Team', b: 'Open Team. In Foil each member is a pack with their name. In Sterling each member is a row.', done: () => S.view === 'team' || S.view === 'lead'},
-  {k: 'person', show: () => S.view === 'team' || S.view === 'lead', tg: '#main .fxpackbtn, #main [data-act=openPerson]', t: 'Open a teammate', b: 'Click a member. In Foil their pack opens with the same animation; cards they have not opened show Unknown rarity. Then their tasks and numbers appear. You can take a task into your own list from there.', done: () => !!ui.pp || !!(ui.rip && ui.rip.who)},
-  {k: 'closeP', t: 'Close it', b: 'Close the pop-up to continue.', done: () => !ui.pp && !ui.rip},
-  {k: 'review', next: 1, t: 'Need review', b: 'The yellow Need review tab shows only when something needs you: assigned tasks waiting for your answer, tasks whose goal or key result was deleted, restored tasks and imported tasks. Give a task a goal and it leaves the tab.'},
-  {k: 'settings', tg: '#setlink', t: 'Settings', b: 'Open the gear. General has appearance, week start and the walkthrough. My Collection (Foil) holds your sealed cards. Privacy has Private my tasks. Import brings Todoist projects. Help answers questions, and your details sit at the lower left.', done: () => S.view === 'settings'},
-  {k: 'leadctl', only: 'lead', tg: '.setit.shiny', t: 'Lead Controls', b: 'Open Lead Controls. Type your own invite code and save. Under People and roles you set roles and press Remove for a person: two confirmations, then you choose to delete their tasks or give them to another member. Tasks others assigned to them lose the Assigned to pill.', done: () => ui.setTab === 'team'},
+  {k: 'today', nav: 'today', tg: '#tabs [data-view=today]', t: 'Today', next: 1, b: '<p class="tr-do">Look around <b>Today</b>.</p><ul class="trl"><li>Arrows and Day, Week, Month change the range</li><li>Planned tasks sit in the middle, unfinished ones above</li><li><b>Day planning</b> on the right: your hours per category</li></ul>'},
+  {k: 'style', tg: 'header.top .brandwrap', t: 'Foil and Sterling', b: '<p class="tr-do">Open the <b>logo menu</b> and pick a look.</p><ul class="trl"><li><b>Foil</b>: every task is a trading card</li><li><b>Sterling</b>: a plain list</li><li>Saved for your account</li></ul>', enter: () => { ui.tourMenu = false; }, done: () => !!ui.tourMenu && !$('#stylemenu')},
+  {k: 'add', nav: 'today', tg: '#main [data-act=quick]', t: 'Create a task', b: '<p class="tr-do">Press <b>Add task</b>, type a title, press <b>Enter</b>, then <b>Esc</b>.</p><ul class="trl"><li>The task is planned for today</li></ul>', done: () => !!newMine() && !ui.tp, after: function(st){ const t = newMine(); if (t) { t.tour = true; st.tid = t.id; } }},
+  {k: 'pack', nav: 'today', show: () => FOILISH() && !(S.foil && S.foil.opened && S.foil.opened[TODAY]), tg: '#main [data-act=fxOpen]', t: 'Open today\'s pack', b: '<p class="tr-do">Press <b>Open a pack</b>.</p><ul class="trl"><li>Cards turn over one by one</li><li>Rarity is random: Base 60%, Rare 25%, Foil 12%, Legend 3%</li><li>Over 7 cards: 7 play, the rest open at once</li></ul>', done: () => !!(S.foil && S.foil.opened && S.foil.opened[TODAY])},
+  {k: 'cards', show: FOILISH, next: 1, t: 'Cards', b: '<ul class="trl"><li><b>Click</b> a card: turn it over</li><li><b>Double-click</b>: lift it to edit</li><li>Tasks added later wait in the <b>Mailbox</b> for about a minute</li><li><b>Sent to</b> stamp: you assigned it</li></ul>'},
+  {k: 'open', tg: () => tourT() ? '#main li[data-id="' + tourT().id + '"]' : '', t: 'Open your task', b: '<p class="tr-do"><b>Open</b> your task.</p><ul class="trl"><li>Foil: double-click the card</li><li>Fields: Planned, Deadline, Goal, Priority, List, Assigned</li><li>A plus means the field is empty</li></ul>', done: () => !!tourT() && ui.tp === tourT().id},
+  {k: 'fields', tg: '#modal .sheet', t: 'Priority and goal', b: '<p class="tr-do">Pick a <b>priority</b> or a <b>goal</b>.</p><ul class="trl"><li>Goals and key results have numbers like <b>1.4</b></li></ul>', enter: () => { ui.tb.pr = tourT() && tourT().priority; }, done: () => { const t = tourT(); return !!t && (t.krId || t.priority !== ui.tb.pr); }},
+  {k: 'deadline', tg: '#modal .sheet', t: 'Set a deadline', b: '<p class="tr-do">Set a <b>deadline</b> for today or tomorrow.</p><ul class="trl"><li>Foil: a round <b>stamp</b> appears and the card dims</li><li>Sterling: the deadline shows in the row</li></ul>', done: () => { const t = tourT(); return !!t && !!t.deadline; }},
+  {k: 'close', t: 'Close the window', b: '<p class="tr-do">Press <b>Esc</b>.</p><ul class="trl"><li>Changes save by themselves</li><li>Top pill: Saving, Saved or an error</li><li>The build number next to it opens the release notes</li></ul>', done: () => !ui.tp},
+  {k: 'seal', tg: () => tourT() ? '#main li[data-id="' + tourT().id + '"]' : '', nav: 'today', t: 'Finish the task', b: '<p class="tr-do"><b>Tick</b> the task.</p><ul class="trl"><li>Foil: it is <b>sealed</b> and moves to My Collection</li><li>Sterling: it is checked off</li></ul>', done: () => { const t = tourT(); return !!t && t.done; }},
+  {k: 'backlog', tg: '#tabs [data-view=backlog]', t: 'Backlog', b: '<p class="tr-do">Open <b>Backlog</b>.</p><ul class="trl"><li>Tasks without a date live here</li><li>Lists and sections group them</li></ul>', done: () => S.view === 'backlog'},
+  {k: 'list', show: () => S.view === 'backlog', tg: '#main [data-act=newList]', t: 'Create a list', enter: () => { ui.tb.lists = S.lists.length; }, b: '<p class="tr-do">Press <b>New list</b> and name it.</p><ul class="trl"><li>Add sections inside a list and drag them</li><li>List or Board changes the view</li></ul>', done: () => S.lists.length > ui.tb.lists},
+  {k: 'sort', tg: '#main .sortsel', t: 'Sort', enter: () => { ui.tb.gs = ui.gsort || ''; }, b: '<p class="tr-do">Choose a <b>Sort</b> option.</p><ul class="trl"><li>Priority, Soon, Deadline, Rarity, Newest, Title</li><li>One choice applies to every tab</li></ul>', done: () => (ui.gsort || '') !== ui.tb.gs},
+  {k: 'goals', tg: '#tabs [data-view=goals]', t: 'Goals', b: '<p class="tr-do">Open <b>Goals</b>.</p><ul class="trl"><li>Key results are numbered 1.1, 1.2 and so on</li><li>Status, quarter and notes are yours</li><li><b>Review</b> gathers what you wrote, ready to copy</li></ul>', done: () => S.view === 'goals'},
+  {k: 'goalsLead', only: 'lead', next: 1, t: 'Goals as a team lead', b: '<ul class="trl"><li>Only team leads create, rename and delete goals</li><li>Members see the names and add their own notes</li><li>Deleting a goal sends its tasks to Need review</li></ul>'},
+  {k: 'assign', show: () => S.users.length > 1, t: 'Assign a task', enter: () => { ui.tb.asg = S.tasks.filter(t => t.asg || (t.grp && t.grp.length)).map(t => t.id); }, b: '<p class="tr-do">Make a second task, open it, press <b>+</b> next to Assigned, pick a teammate.</p><ul class="trl"><li>Live version: they receive it for real. Skip if unsure.</li></ul>', done: () => S.tasks.some(t => t.owner === S.me && (t.asg || (t.grp && t.grp.length)) && ui.tb.asg.indexOf(t.id) < 0)},
+  {k: 'asgInfo', show: () => S.users.length > 1, next: 1, t: 'What the pills mean', b: '<ul class="trl"><li><b>Dotted</b> pill: waiting for an answer</li><li><b>Solid</b> pill: the answer, such as Maya accepted</li><li>They answer in Need review: Accept, Decline or Suggest someone</li><li>After accepting, they own it and you see its status</li></ul>'},
+  {k: 'team', tg: '#tabs [data-view=team]', t: 'Team', b: '<p class="tr-do">Open <b>Team</b>.</p><ul class="trl"><li>Foil: each member is a pack</li><li>Sterling: each member is a row</li></ul>', done: () => S.view === 'team' || S.view === 'lead'},
+  {k: 'person', show: () => S.view === 'team' || S.view === 'lead', tg: '#main .fxpackbtn, #main [data-act=openPerson]', t: 'Open a teammate', b: '<p class="tr-do"><b>Click</b> a teammate.</p><ul class="trl"><li>Foil: their pack opens, unopened cards show <b>Unknown rarity</b></li><li>Then their tasks and numbers appear</li><li>You can take a task into your own list</li></ul>', done: () => !!ui.pp || !!(ui.rip && ui.rip.who)},
+  {k: 'closeP', t: 'Close it', b: '<p class="tr-do"><b>Close</b> the pop-up.</p>', done: () => !ui.pp && !ui.rip},
+  {k: 'review', next: 1, t: 'Need review', b: '<ul class="trl"><li>The yellow tab shows only when something needs you</li><li>Assigned tasks, tasks that lost their goal, restored and imported tasks</li><li>Give a task a goal and it leaves the tab</li></ul>'},
+  {k: 'settings', tg: '#setlink', t: 'Settings', b: '<p class="tr-do">Open the <b>gear</b>.</p><ul class="trl"><li>General, My Collection, Privacy, Import, Help</li><li>Your details: lower left</li></ul>', done: () => S.view === 'settings'},
+  {k: 'leadctl', only: 'lead', tg: '.setit.shiny', t: 'Lead Controls', b: '<p class="tr-do">Open <b>Lead Controls</b>.</p><ul class="trl"><li>Invite code: type your own</li><li>People and roles: set roles, <b>Remove</b> a person (two confirmations)</li></ul>', done: () => ui.setTab === 'team'},
   {k: 'signs', next: 1, t: 'Indicators', b: '<ul class="trl"><li>A blue dot before a task title: your team can see it.</li><li>The yellow Need review tab: something waits for you.</li><li>A round stamp on a card: due today, tomorrow or overdue.</li><li>The pill at the top: Saving, Saved or an error, with the environment and build.</li><li>The New tag by the logo: something new in this build.</li><li>Unknown rarity: a card that has not been opened yet.</li><li>The shining Lead Controls item: team leads only.</li></ul>'},
-  {k: 'end', fin: 1, t: 'You are set', b: 'That is the whole app. The tasks you made in this walkthrough are marked. Delete them now or keep them. You can run the walkthrough again any time from Settings, General, Start the demo again.'}
+  {k: 'end', fin: 1, t: 'You are set', b: '<ul class="trl"><li>Delete the tasks you made, or keep them</li><li>Restart any time: Settings, General, <b>Start the demo again</b></li></ul>'}
 ];
 const tourList = () => TOUR.filter(s => !s.only || s.only === roleKey());
 function tourCur(){ const st = tourSt(); if (!st || st.off) return null; return tourList()[st.i] || null; }
@@ -5702,16 +5704,25 @@ function tourGo(i){
   tourPanel(true);
 }
 function tourAdvance(){ const st = tourSt(); if (st) tourGo(st.i + 1); }
+function tourSpotOff(){ ['tourspot', 'tourring'].forEach(function(id){ const e = document.getElementById(id); if (e) e.remove(); }); }
 function tourHl(sel, scroll){
-  document.querySelectorAll('.tour-hl').forEach(e => e.classList.remove('tour-hl'));
-  if (!sel) return;
-  let el = null; try { el = document.querySelector(sel); } catch(e) {}
-  if (!el) return; el.classList.add('tour-hl');
-  if (scroll) { const r = el.getBoundingClientRect(); if (r.top < 70 || r.bottom > innerHeight - 290) { try { el.scrollIntoView({block: 'center', behavior: 'smooth'}); } catch(e) {} } }
+  let el = null; if (sel && !ui.tourMin && !ui.rip) { try { el = document.querySelector(sel); } catch(e) {} }
+  if (!el) { tourSpotOff(); return; }
+  if (scroll) { const q = el.getBoundingClientRect(); if (q.top < 70 || q.bottom > innerHeight - 290) { try { el.scrollIntoView({block: 'center', behavior: 'smooth'}); } catch(e) {} } }
+  const r = el.getBoundingClientRect(); if (!r.width || !r.height) { tourSpotOff(); return; }
+  const pad = 8, rad = 12, W = innerWidth, H = innerHeight;
+  const x = Math.max(2, r.left - pad), y = Math.max(2, r.top - pad), x2 = Math.min(W - 2, r.right + pad), y2 = Math.min(H - 2, r.bottom + pad), w = x2 - x, h = y2 - y;
+  let o = document.getElementById('tourspot'), g = document.getElementById('tourring');
+  if (!o) { o = document.createElement('div'); o.id = 'tourspot'; o.setAttribute('aria-hidden', 'true'); document.body.appendChild(o); }
+  if (!g) { g = document.createElement('div'); g.id = 'tourring'; g.setAttribute('aria-hidden', 'true'); document.body.appendChild(g); }
+  o.style.clipPath = 'path(evenodd,"M0 0H' + W + 'V' + H + 'H0Z M' + (x + rad) + ' ' + y + 'H' + (x2 - rad) + 'A' + rad + ' ' + rad + ' 0 0 1 ' + x2 + ' ' + (y + rad) + 'V' + (y2 - rad) + 'A' + rad + ' ' + rad + ' 0 0 1 ' + (x2 - rad) + ' ' + y2 + 'H' + (x + rad) + 'A' + rad + ' ' + rad + ' 0 0 1 ' + x + ' ' + (y2 - rad) + 'V' + (y + rad) + 'A' + rad + ' ' + rad + ' 0 0 1 ' + (x + rad) + ' ' + y + 'Z")';
+  g.style.cssText = 'left:' + x + 'px;top:' + y + 'px;width:' + w + 'px;height:' + h + 'px;border-radius:' + rad + 'px';
 }
+function tourSpotNow(){ const s = tourCur(); if (!s) { tourSpotOff(); return; } tourHl(typeof s.tg === 'function' ? s.tg() : s.tg, false); }
+(function(){ let q = 0; const f = function(){ if (q) return; q = requestAnimationFrame(function(){ q = 0; tourSpotNow(); }); }; window.addEventListener('scroll', f, true); window.addEventListener('resize', f); })();
 function tourPanel(scroll){
   let p = document.getElementById('tour'); const s = tourCur(), L = tourList(), st = tourSt();
-  if (!s || !me()) { if (p) p.remove(); tourHl(''); return; }
+  if (!s || !me()) { if (p) p.remove(); tourSpotOff(); return; }
   if (!p) { p = document.createElement('div'); p.id = 'tour'; p.setAttribute('role', 'region'); p.setAttribute('aria-label', 'Walkthrough'); document.body.appendChild(p); }
   const idx = L.indexOf(s), min = !!ui.tourMin;
   p.className = min ? 'min' : '';
@@ -5724,7 +5735,7 @@ function tourPanel(scroll){
 function tourTick(){
   const s = tourCur(); if (!s) { if (document.getElementById('tour')) tourPanel(); return; }
   if (!document.getElementById('tour')) tourPanel(true);
-  else { const sel = typeof s.tg === 'function' ? s.tg() : s.tg; if (sel && !document.querySelector('.tour-hl')) tourHl(sel, false); }
+  else tourSpotNow();
   if (s.done && ui.tb && !ui.tourAdv) {
     let ok = false; try { ok = s.done(); } catch(e) {}
     if (ok) { ui.tourAdv = true; const st = tourSt(); if (s.after) s.after(st); tourSet(st); setTimeout(function(){ ui.tourAdv = false; tourAdvance(); }, 450); }
