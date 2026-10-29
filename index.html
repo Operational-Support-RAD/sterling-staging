@@ -331,6 +331,14 @@ body.is-dragging{user-select:none;-webkit-user-select:none;cursor:grabbing}
 .ghead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:nowrap;margin-bottom:10px}
 .ghead>.c1{flex:1 1 0;min-width:0}
 .ghead>.row{flex:none;align-self:center}
+.presence{display:inline-flex;align-items:center;margin-right:10px;vertical-align:middle}
+.prs{position:relative;display:inline-grid;place-items:center;width:28px;height:28px;margin-left:-6px;border-radius:50%;background:var(--soft);color:var(--ink);border:2px solid var(--bg);box-shadow:0 0 0 1.5px var(--good);font:700 .75rem var(--font-body,inherit);cursor:default}
+.prs:first-child{margin-left:0}
+.prs.idle{opacity:.45;box-shadow:0 0 0 1.5px var(--line)}
+.prs.more{background:var(--bg);color:var(--muted);box-shadow:0 0 0 1.5px var(--line)}
+body.foil .prs{background:linear-gradient(135deg,#FFE9A8,#FFC2DD 50%,#BFE7F5);box-shadow:0 0 0 1.5px #14213D}
+body.foil .prs.idle{box-shadow:0 0 0 1.5px var(--line)}
+@media (max-width:760px){.presence{display:none}}
 .envpill{background:transparent;font-family:inherit;cursor:pointer;display:inline-block;font-size:.75rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:3.4px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
 .authbox .envpill.auth{align-self:flex-start;margin-top:-14px;cursor:default}
 .envpill .envb{font-weight:500;letter-spacing:.04em;opacity:.55;margin-left:6px}
@@ -1306,7 +1314,7 @@ body.foil #tour{border:2px solid transparent;background:linear-gradient(var(--su
 <div class="app">
   <header class="top">
     <div class="brandwrap"><div class="brand" role="img" aria-label="Sterling">S<svg aria-hidden="true" focusable="false" viewBox="0 0 70 80"><path d="M 27 6.5 V 52 C 27 67 36 73.5 48 73.5 C 57 73.5 62 69 63.5 62" stroke-width="13"/><path d="M 5 6.5 H 65" stroke-width="13"/><path d="M 3 34.5 H 55" stroke-width="13" stroke-dasharray="10.5 3.5"/></svg>erling<span class="dot"></span></div><span class="brandsub" aria-hidden="true"><span>T</span><span>R</span><span>A</span><span>C</span><span>K</span><span>E</span><span>R</span></span><span class="fxnew" aria-hidden="true">New</span></div>
-    <div class="who"><button type="button" class="envpill" id="envpill" data-act="openBuild" aria-label="What is new in this build" hidden></button> <label for="who" id="whowrap">Viewing as <select id="who" data-chg="user"></select></label> <button type="button" id="whoami" class="whoami" data-act="openProfile" aria-label="Your details"></button> <button type="button" id="setlink" class="whoami iconlink" data-act="nav" data-view="settings" aria-label="Settings" title="Settings"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button></div>
+    <div class="who"><span id="presence" class="presence" role="group" aria-label="Online now" hidden></span> <button type="button" class="envpill" id="envpill" data-act="openBuild" aria-label="What is new in this build" hidden></button> <label for="who" id="whowrap">Viewing as <select id="who" data-chg="user"></select></label> <button type="button" id="whoami" class="whoami" data-act="openProfile" aria-label="Your details"></button> <button type="button" id="setlink" class="whoami iconlink" data-act="nav" data-view="settings" aria-label="Settings" title="Settings"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button></div>
   </header>
   <p class="demo">Demo data, stored only in this browser. Switch the person to see their view.</p>
   <nav class="tabs" id="tabs" aria-label="Sections"></nav>
@@ -3005,6 +3013,7 @@ function render(){
   document.body.classList.toggle('foil', foilOn());
   document.body.classList.toggle('fxfirst', fxLocked());
   cardSzApply();
+  presRender();
   if (S.signedIn && S.settings && !fxLocked()) { try { localStorage.setItem('fx-style', foilOn() ? 'foil' : 'sterling'); } catch(e) {} }
   if (me()) $('#whoami').textContent = CLOUD ? me().name + ' (' + (isLead() ? 'Team lead' : 'Member') + ')' : 'Your details';
   const w = $('#who');
@@ -5741,7 +5750,7 @@ async function enterCloud(){
   }
   if (r !== 'ok') return false;
   S.signedIn = true; ui.authErr = '';
-  document.body.classList.add('cloud');
+  document.body.classList.add('cloud'); presStart();
   showAuth(); render();
   if (cloud.dirty) flush();
   return true;
@@ -5788,6 +5797,46 @@ function introCheck(){
     '<p>' + c.lead + '</p><h3>What this means</h3><ul>' + c.can.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul><p class="muted">' + esc(c.cant) + '</p>' +
     '<div class="actions">' + (first ? '<button type="button" class="btn" data-act="introLater">Not now</button><button type="button" class="btn primary" data-act="tourStart">Start the walkthrough</button>' : '<button type="button" class="btn primary" data-act="modalOff">Got it</button>') + '</div></div>');
   $('#modal').classList.add('center');
+}
+
+/* Who is online (Supabase Realtime presence in the cloud version, sample people in the demo) */
+const pres = {ch: null, state: {}, last: Date.now(), idle: false, timer: null};
+function presKey(){ return CLOUD ? pres.state : null; }
+function presList(){
+  if (!S || !S.signedIn || !me()) return [];
+  const out = [];
+  if (CLOUD) { Object.keys(pres.state).forEach(function(id){ if (id === S.me) return; const u = user(id); if (!u) return; const m = (pres.state[id] || [])[0] || {}; out.push({u: u, idle: !!m.idle}); }); }
+  else { S.users.filter(u => u.id !== S.me).slice(0, 4).forEach(function(u, i){ out.push({u: u, idle: i === 2}); }); }
+  return out.sort((a, b) => (a.idle - b.idle) || a.u.name.localeCompare(b.u.name));
+}
+function presRender(){
+  const el = document.getElementById('presence'); if (!el) return;
+  const L = presList();
+  if (!L.length) { el.hidden = true; el.innerHTML = ''; return; }
+  const sig = L.map(x => x.u.id + (x.idle ? 'i' : 'a')).join(',');
+  if (el.dataset.sig === sig) return;
+  el.dataset.sig = sig; el.hidden = false;
+  const max = 5;
+  el.innerHTML = L.slice(0, max).map(x => '<span class="prs' + (x.idle ? ' idle' : '') + '" title="' + esc(x.u.name) + (x.idle ? ' (away)' : ' (in the app)') + '" aria-label="' + esc(x.u.name) + (x.idle ? ', away' : ', in the app') + '">' + esc(String(x.u.name).charAt(0).toUpperCase()) + '</span>').join('') +
+    (L.length > max ? '<span class="prs more" title="' + esc(L.slice(max).map(x => x.u.name).join(', ')) + '">+' + (L.length - max) + '</span>' : '');
+}
+function presStart(){
+  if (!CLOUD || !SB || !cloud.team || pres.ch) return;
+  try {
+    pres.ch = SB.channel('presence:' + cloud.team.id, {config: {presence: {key: cloud.uid}}});
+    pres.ch.on('presence', {event: 'sync'}, function(){ pres.state = pres.ch.presenceState(); presRender(); })
+      .subscribe(function(st){ if (st === 'SUBSCRIBED') pres.ch.track({idle: false, at: Date.now()}); });
+  } catch(e) { pres.ch = null; return; }
+  const bump = function(){ pres.last = Date.now(); if (pres.idle) presSetIdle(false); };
+  ['pointerdown', 'keydown', 'mousemove', 'scroll', 'touchstart'].forEach(ev => document.addEventListener(ev, bump, {passive: true, capture: true}));
+  document.addEventListener('visibilitychange', function(){ if (document.hidden) presSetIdle(true); else bump(); });
+  pres.timer = setInterval(function(){ if (!pres.idle && (document.hidden || Date.now() - pres.last > 5 * 60000)) presSetIdle(true); }, 20000);
+}
+function presSetIdle(v){ pres.idle = v; try { if (pres.ch) pres.ch.track({idle: v, at: Date.now()}); } catch(e) {} }
+function presStop(){
+  clearInterval(pres.timer); pres.timer = null;
+  try { if (pres.ch) { pres.ch.untrack(); SB.removeChannel(pres.ch); } } catch(e) {}
+  pres.ch = null; pres.state = {}; presRender();
 }
 
 /* Foil reveal */
@@ -6081,7 +6130,7 @@ async function cloudSignUp(f){
   stampLogin(); await enterCloud();
 }
 async function cloudSignOut(){
-  clearTimeout(cloud.timer);
+  presStop(); clearTimeout(cloud.timer);
   try { await flush(); } catch(e) {}
   await SB.auth.signOut(); try { localStorage.removeItem('sterling-login-at'); } catch(e) {}
   S = emptyState(); cloud.synced = {}; cloud.meta = {}; cloud.loaded = false; ui.authTab = 'in'; ui.authErr = '';
