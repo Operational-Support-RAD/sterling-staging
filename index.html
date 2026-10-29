@@ -298,7 +298,7 @@ input.tgl[type="checkbox"]:checked::after{display:block;transform:translateX(16p
 .qawrap{margin:44px auto 20px;max-width:760px;text-align:left}
 .qawrap .sect,.qawrap .sectsub{text-align:left}
 .qag{font-size:.9375rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink);font-weight:700;margin:34px 0 8px;text-align:left}
-body.qafocus header.top,body.qafocus #tabs,body.qafocus #main>*:not(.qawrap),body.qafocus .qawrap .sect,body.qafocus .qawrap .sectsub,body.qafocus .qawrap .qag,body.qafocus .qawrap .qai:not(.open){filter:blur(4px);opacity:.55}
+body.qafocus header.top,body.qafocus #tabs,body.qafocus #main>*:not(.qawrap):not(.setov),body.qafocus .qawrap .sect,body.qafocus .qawrap .sectsub,body.qafocus .qawrap .qag,body.qafocus .qawrap .qai:not(.open){filter:blur(4px);opacity:.55}
 .qa{display:flex;flex-direction:column;max-width:760px;margin:0 auto}
 .qa .qai{border-top:1px solid rgba(128,128,128,.38);border-bottom:1px solid rgba(128,128,128,.38)}
 .qa .qai+.qai{margin-top:-1px}
@@ -844,7 +844,12 @@ body.foil .fxinner{position:relative;width:100%;height:100%;transition:transform
 body.foil .fxcard.up .fxinner{transform:rotateY(180deg)}
 body.foil .fxface{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:18px;padding:7px;box-shadow:0 10px 22px rgba(20,33,61,.28)}
 body.foil .fxfront{transform:rotateY(180deg)}
-body.foil .fxback{background:#14213D}
+body.foil .fxback{background:#FFAE1A;overflow:hidden}
+body.foil .fxpack.fxbk .fxlogo{top:15%}
+body.foil .fxpack.fxbk .fxwd{top:61%}
+body.foil .fxpack.fxbk{width:100%;height:100%;font-size:20px;transform:none!important;box-shadow:none;border-radius:inherit;filter:none}
+body.foil .fxpack.fxbk::before{animation:none;background-position:35% 0}
+body.foil .fxpack.fxbk::after{display:none}
 body.foil .fxbin{height:100%;border:2px solid #F3E9D2;border-radius:12px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
 body.foil .fxband{position:absolute;left:-30px;right:-30px;top:138px;height:42px;transform:rotate(-6deg);background:linear-gradient(90deg,#FFC300,#FF6FB5,#7AD7F0,#B8F28B)}
 body.foil .fxf{position:relative;font-family:Anton,Impact,sans-serif;font-size:136px;line-height:1;color:#F3E9D2;transform:rotate(-6deg);margin-top:-6px}
@@ -910,7 +915,7 @@ body.foil .fxsub.on span{opacity:.6;text-decoration:line-through}
 body.foil .fxhist{margin-top:auto;border-top:2px solid;padding-top:6px;font:12px/1.6 var(--font-mono);letter-spacing:.04em;text-transform:uppercase}
 body.foil .fxpop{display:flex;flex-direction:column;gap:6px;margin:6px 0 10px}
 body.foil .fxpop .fxwin{height:120px}
-body.foil .sheet.tp{--fxframe:#14213D;--fxface:#FBF6E9;width:min(420px,100%);min-height:560px;padding:16px;border:9px solid transparent;border-radius:26px;background:linear-gradient(var(--fxface),var(--fxface)) padding-box,var(--fxframe) border-box;color:var(--ink);box-shadow:0 24px 60px rgba(20,33,61,.5)}
+body.foil .sheet.tp{--fxframe:#8D97B3;--fxface:#FBF6E9;width:min(420px,100%);min-height:560px;padding:16px;border:9px solid transparent;border-radius:26px;background:linear-gradient(var(--fxface),var(--fxface)) padding-box,var(--fxframe) border-box;color:var(--ink);box-shadow:0 24px 60px rgba(20,33,61,.5)}
 body.foil .sheet.tp[data-tier=rare]{--fxframe:linear-gradient(135deg,#7E1120 0%,#D62839 28%,#FF7A88 50%,#D62839 72%,#8E1424 100%)}
 body.foil .sheet.tp[data-tier=foil]{--fxframe:linear-gradient(135deg,#FFC300,#FF6FB5,#7AD7F0,#B8F28B)}
 body.foil .sheet.tp[data-tier=legend]{--fxframe:#FFC300;--fxface:#14213D;--ink:#F3E9D2;--muted:#B9C0D6;--line:#2B3C66;--surface:#14213D}
@@ -918,6 +923,10 @@ body.foil .sheet.tp h2{font-family:Anton,Impact,sans-serif;font-weight:400;text-
 body.foil .sheet.tp .mtype{font-family:var(--font-mono)}
 body.foil .fxsent{position:absolute;left:50%;bottom:62px;transform:translateX(-50%) rotate(-8deg);white-space:nowrap;max-width:94%;overflow:hidden;text-overflow:ellipsis;font:700 15px var(--font-mono);letter-spacing:.1em;text-transform:uppercase;color:#14213D;border:3px solid #14213D;border-radius:4px;padding:3px 10px;background:rgba(251,246,233,.92);pointer-events:none;z-index:2}
 body.foil .fxsent.dec{color:#D62839;border-color:#D62839}
+.colchip{cursor:pointer}
+.colchip[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+body.foil .fxshine.hot{background:linear-gradient(115deg,transparent 20%,rgba(255,255,255,.7) 36%,rgba(255,111,181,.34) 45%,rgba(122,215,240,.34) 54%,rgba(255,255,255,.4) 60%,transparent 72%);background-size:250% 100%;animation-duration:2.8s;mix-blend-mode:normal}
+body.foil li.task.fl:has(.fxshine.hot) .fxface.fxfront{box-shadow:0 0 16px 3px rgba(255,195,0,.75),0 0 30px 6px rgba(255,79,163,.35)}
 body.foil .fxshine.soft{background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.24) 46%,rgba(255,190,196,.14) 52%,transparent 62%);background-size:250% 100%;animation-duration:6.5s}
 body.foil .wcol .tasks.fxmini{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 6px}
 body.foil .wcol li.task.fl{zoom:.8;border:0;padding:0}
@@ -994,7 +1003,17 @@ body.foil .tab.yel:hover{filter:none;transform:translate(1px,1px);box-shadow:2px
 .sethd h2{margin:0;font-size:1.125rem;font-weight:600}
 .setx{background:none;border:0;color:var(--muted);cursor:pointer;width:36px;height:36px;border-radius:8px;display:grid;place-items:center}
 .setx:hover{background:var(--soft);color:var(--ink)}
-.setbd{display:grid;grid-template-columns:300px minmax(0,1fr);flex:1;min-height:0}
+.setbd{display:grid;grid-template-columns:300px minmax(0,1fr);flex:1;min-height:0;transition:grid-template-columns .28s ease}
+.sethl{display:flex;align-items:center;gap:10px}
+.sethl h2{margin:0}
+.setcol{display:grid;place-items:center;width:34px;height:34px;border-radius:8px;border:1px solid var(--line);background:none;color:var(--muted);cursor:pointer}
+.setcol:hover{background:var(--soft);color:var(--ink)}
+.setcol svg{transition:transform .28s ease}
+.setpanel.navoff .setcol svg{transform:rotate(180deg)}
+.setpanel.navoff .setbd{grid-template-columns:0 minmax(0,1fr)}
+.setnav{transition:opacity .2s ease,padding .28s ease}
+.setpanel.navoff .setnav{padding-left:0;padding-right:0;opacity:0;overflow:hidden;border-right:0;visibility:hidden;transition:opacity .2s ease,padding .28s ease,visibility 0s .28s}
+@media (max-width:760px){.setcol{display:none}}
 .setnav{border-right:1px solid var(--line);padding:22px 22px 18px;overflow:auto;display:flex;flex-direction:column;gap:2px}
 .setsearch{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;padding:0 12px;height:44px;color:var(--muted);margin-bottom:10px}
 .setsearch:focus-within{border-color:var(--ink)}
@@ -1200,16 +1219,19 @@ body.foil .qag.qfoil{display:inline-block;background:linear-gradient(100deg,#FFA
 @media (prefers-reduced-motion:no-preference){#modal .sheet:has(.fxwel){animation:fxborder 5s linear infinite}@keyframes fxborder{to{background-position:0 0,300% 0}}}
 
 /* Foil: holographic background, colored frames, compact team cards */
-body.foil::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.55) 49%,rgba(255,255,255,.0) 60%) 0 0/250% 100%,linear-gradient(125deg,rgba(255,195,0,.26),rgba(255,79,163,.22) 22%,rgba(91,140,255,.26) 45%,rgba(47,196,165,.22) 68%,rgba(255,195,0,.26)) 0 0/300% 300%;animation:fxholo 16s ease-in-out infinite alternate}
-@keyframes fxholo{0%{background-position:130% 0,0% 0%}100%{background-position:-30% 0,100% 100%}}
+body.foil::after{content:"";position:fixed;top:0;bottom:0;left:0;width:300%;z-index:-1;pointer-events:none;background:linear-gradient(105deg,rgba(255,195,0,.26),rgba(255,79,163,.22) 16%,rgba(255,255,255,.35) 25%,rgba(91,140,255,.26) 38%,rgba(47,196,165,.22) 55%,rgba(255,255,255,.3) 66%,rgba(255,195,0,.26) 82%,rgba(255,79,163,.22));will-change:transform;animation:fxholo 22s ease-in-out infinite alternate}
+@keyframes fxholo{0%{transform:translate3d(0,0,0)}100%{transform:translate3d(-66.6%,0,0)}}
 :root:not([data-theme=light]) body.foil::after{opacity:.9}
 @media (prefers-color-scheme:light){:root:not([data-theme=dark]) body.foil::after{opacity:1}}
 :root[data-theme=dark] body.foil::after{opacity:.9}
 :root[data-theme=light] body.foil::after{opacity:1}
 body.foil .card,body.foil .card.main{border:2px solid transparent;background:linear-gradient(var(--surface),var(--surface)) padding-box,linear-gradient(120deg,#FFC300,#FF4FA3,#5B8CFF,#2FC4A5,#FFC300) border-box;background-size:100% 100%,300% 100%;box-shadow:0 0 22px rgba(255,79,163,.16)}
 body.foil .tabs{border-bottom:3px solid transparent;border-image:linear-gradient(90deg,#FFC300,#FF4FA3,#5B8CFF,#2FC4A5) 1}
-@media (prefers-reduced-motion:no-preference){body.foil .card{animation:fxframe 9s linear infinite}@keyframes fxframe{to{background-position:0 0,300% 0}}}
-@media (prefers-reduced-motion:reduce){body.foil::after{animation:none;background-position:40% 0,30% 30%}}
+@media (prefers-reduced-motion:reduce){body.foil::after{animation:none}}
+body.foil .tasks.fxday{grid-template-columns:repeat(auto-fill,minmax(152px,1fr));gap:12px 8px;justify-items:start}
+body.foil .tasks.fxday li.task.fl{zoom:.64}
+body.foil #main:has(li.task.fl:nth-child(9)) li.task.fl:not(:hover):not(:focus-within) .fxshine:not(.hot){animation-play-state:paused}
+body.foil li.task.fl{contain:layout style}
 body.foil .sheet:has(.ppeople){width:min(1040px,100%)}
 body.foil .ppeople{width:100%!important}
 body.foil .ppeople .tasks{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px 8px;justify-items:start}
@@ -2021,7 +2043,7 @@ function taskState(t){
 }
 /* ---------- Foil style ---------- */
 const FX_TIERS = {
-  base: {n: 'Base', w: 60, frame: '#14213D', face: '#F3E9D2', ink: '#14213D', win: '#E8DCC0', dot: 'rgba(20,33,61,.28)', art: '#14213D', fill: 'none', band: '#14213D', bi: '#F3E9D2', shine: 0, pool: ['list', 'mail', 'flag', 'key']},
+  base: {n: 'Base', w: 60, frame: '#8D97B3', face: '#F3E9D2', ink: '#14213D', win: '#E8DCC0', dot: 'rgba(20,33,61,.28)', art: '#14213D', fill: 'none', band: '#5A6585', bi: '#F3E9D2', shine: 0, pool: ['list', 'mail', 'flag', 'key']},
   rare: {n: 'Rare', w: 25, frame: 'linear-gradient(135deg,#7E1120 0%,#D62839 28%,#FF7A88 50%,#D62839 72%,#8E1424 100%)', face: '#FBF6E9', ink: '#14213D', win: '#F7C6CB', dot: 'rgba(214,40,57,.35)', art: '#D62839', fill: 'none', band: 'linear-gradient(90deg,#B81F30,#FF5C6E 50%,#B81F30)', bi: '#FFFFFF', shine: 0, pool: ['bars', 'plane', 'lens', 'gear']},
   foil: {n: 'Foil', w: 12, frame: 'linear-gradient(135deg,#FFC300,#FF6FB5,#7AD7F0,#B8F28B)', face: '#FBF6E9', ink: '#14213D', win: '#FBEFB8', dot: 'rgba(20,33,61,.25)', art: '#14213D', fill: '#FFC300', band: 'linear-gradient(90deg,#FFC300,#FF6FB5,#7AD7F0,#B8F28B)', bi: '#14213D', shine: 1, pool: ['star', 'gear', 'plane', 'bars']},
   legend: {n: 'Legend', w: 3, frame: '#FFC300', face: '#14213D', ink: '#F3E9D2', win: '#1B2C52', dot: 'rgba(243,233,210,.22)', art: '#FFC300', fill: '#FFC300', band: '#FFC300', bi: '#14213D', shine: 1, pool: ['crown', 'star', 'flag']}
@@ -2240,10 +2262,10 @@ function fxFront(t){
     '<div class="fxwin" style="border-color:' + x.ink + ';background-color:' + x.win + ';background-image:radial-gradient(circle,' + x.dot + ' 1.2px,transparent 1.6px);background-size:10px 10px"><svg width="86" height="86" viewBox="0 0 100 100" fill="' + x.fill + '" stroke="' + x.art + '" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' + FX_ART[t.fx.art] + '" fill-rule="evenodd"></path></svg></div>' +
     '<div class="fxbd" style="background:' + x.band + ';color:' + x.bi + '">' + x.n + '</div>' +
     '<div class="fxst" style="color:' + x.ink + '">' + fxStat('PRI', fxPriName(t)) + fxStat('EFF', +t.est > 0 ? fmtH(+t.est).replace(' h', 'H') : '---') + fxStat('DUE', due) + fxStat('CLI', cli) + '</div>' +
-    (x.shine ? '<div class="fxshine' + (x.shine === 2 ? ' soft' : '') + '"></div>' : '') + fxSent(t) + '<div class="fxstamp">Sealed</div>' + fxDueStamp(t) + '</div></div>';
+    (x.shine ? '<div class="fxshine' + (x.shine === 2 ? ' soft' : ' hot') + '"></div>' : '') + fxSent(t) + '<div class="fxstamp">Sealed</div>' + fxDueStamp(t) + '</div></div>';
 }
 function fxBack(t){
-  return '<div class="fxface fxback"><div class="fxbin"><div class="fxband"></div><div class="fxf">F</div><div class="fxcorner"></div><div class="fxpk">PACK ' + fxDayNo(t.date) + '</div><div class="fxwm">Foil</div></div></div>';
+  return '<div class="fxface fxback"><div class="fxpack fxbk"><i class="fxcr t"></i><div class="fxlogo"><b>F</b><u></u></div><div class="fxwd">Foil</div><div class="fxlb">Pack ' + fxDayNo(t.date) + '</div><i class="fxcr b"></i><i class="fxsp1"></i></div></div>';
 }
 function fxDetail(t){
   const x = FX_TIERS[(t.fx || {}).tier]; if (!x) return fxBack(t);
@@ -2491,7 +2513,7 @@ function dayBody(){
   const vis = '<select class="plain" data-chg="vis" aria-label="Show tasks">' + [['', 'All'], ['me', 'Only me'], ['team', 'Team']].map(o => '<option value="' + o[0] + '"' + ((ui.vis || '') === o[0] ? ' selected' : '') + '>Show: ' + o[1] + '</option>').join('') + '</select>';
   return '<div class="cols"><div class="stack">' + (over.length ? overdueCard(over) : '') +
     '<section class="card main" data-dzdate="' + d + '"><div class="row between" style="margin-bottom:10px"><span class="row" style="gap:12px"><h2 style="margin:0" id="h-plan">' + (foilOn() ? 'Today\'s pack' : 'Planned') + '</h2><button type="button" class="btn exb small" data-act="quick">Add task</button></span><button class="btn quiet frombl" data-act="pickBacklog">Plan from backlog</button></div>' +
-    packBox + (planned.length ? '<ul class="tasks big" data-list="day">' + planned.map(t => taskRow(t, {drag: dg, plan: true})).join('') + '</ul>' : packBox ? '' : '<p class="empty">Nothing planned for this day.</p>') +
+    packBox + (planned.length ? '<ul class="tasks big' + (foilOn() ? ' fxday' : '') + '" data-list="day">' + planned.map(t => taskRow(t, {drag: dg, plan: true})).join('') + '</ul>' : packBox ? '' : '<p class="empty">Nothing planned for this day.</p>') +
     '</section>' +
     (doneList.length ? '<details class="card donebox" id="donebox"' + (ui.doneOpen ? ' open' : '') + '><summary>Completed ' + (d === TODAY ? 'today' : 'this day') + ' (' + doneList.length + ')</summary><ul class="tasks">' + doneList.map(t => taskRow(t, {plan: true})).join('') + '</ul></details>' : '') + '</div>' +
     '<div class="stack">' + (foilOn() ? fxMailCard() : '') + '<section class="card side" id="budget-card">' + budgetCard() + '</section></div></div>';
@@ -2539,8 +2561,11 @@ function collectionHtml(){
   let b = liveTasks().filter(t => t.owner === S.me && t.done).sort((a, c) => String(c.doneAt || '').localeCompare(String(a.doneAt || '')));
   if (ui.gsort && ui.gsort !== 'priority') b = sortTasks(b, ui.gsort);
   const cnt = {base: 0, rare: 0, foil: 0, legend: 0}; b.forEach(t => { if (t.fx && cnt[t.fx.tier] != null) cnt[t.fx.tier]++; });
-  return '<div class="row" style="gap:8px;margin-bottom:16px;flex-wrap:wrap">' + sortSelect('sortCol') + (b.length ? '<span class="chip">' + b.length + ' sealed</span>' + FX_ORDER.map(k => '<span class="chip">' + FX_TIERS[k].n + ' ' + cnt[k] + '</span>').join('') : '') + '</div>' +
-    (b.length ? '<ul class="tasks big fxmini fxall">' + b.map(t => taskRow(t, {plan: true})).join('') + '</ul>' : '<p class="empty">Your collection is empty. Finished cards are sealed and kept here.</p>');
+  const all = b, ct = ui.colTier && cnt[ui.colTier] != null ? ui.colTier : '';
+  if (ct) b = b.filter(t => t.fx && t.fx.tier === ct);
+  const chip = (k, label, n) => '<button type="button" class="chip colchip" data-act="colTier" data-tier="' + k + '" aria-pressed="' + (ct === k) + '">' + label + ' ' + n + '</button>';
+  return '<div class="row" style="gap:8px;margin-bottom:16px;flex-wrap:wrap">' + sortSelect('sortCol') + (all.length ? chip('', 'All', all.length) + FX_ORDER.map(k => chip(k, FX_TIERS[k].n, cnt[k])).join('') : '') + '</div>' +
+    (b.length ? '<ul class="tasks big fxmini fxall">' + b.map(t => taskRow(t, {plan: true})).join('') + '</ul>' : '<p class="empty">' + (all.length ? 'No ' + FX_TIERS[ct].n + ' cards yet.' : 'Your collection is empty. Finished cards are sealed and kept here.') + '</p>');
 }
 setInterval(function(){
   if (!foilOn() || document.hidden) return;
@@ -4462,7 +4487,6 @@ function setPane(tab){
     return h('Privacy and data') +
       srow('Private my tasks', 'Hides all your tasks from everyone except team leads. Applies to existing and new tasks.', '<input type="checkbox" class="tgl" data-chg="privTasks"' + ((S.settings.privTasks || {})[S.me] ? ' checked' : '') + ' aria-label="Private my tasks">') +
       visCard() + trashRow +
-      srow('Walkthrough', 'A guided demo that walks through every part of the app. You click and create things as you go. Tasks you make in it are marked so you can delete them at the end.', '<button type="button" class="btn" data-act="tourStart">Start the demo again</button>') +
       srow('Your data', 'Export your own tasks, reflections and goals. In the real version the team also gets a daily encrypted backup.', '<span class="row" style="justify-content:flex-end"><button class="btn" data-act="exportJson">Copy as JSON</button><button class="btn" data-act="exportCsv">Copy tasks as CSV</button></span>');
   }
   if (tab === 'import') return h('Import') + todoistCard() + importCard();
@@ -4476,6 +4500,7 @@ function setPane(tab){
   const on = foilOn(); let fast = false; try { fast = localStorage.getItem('foil-fast') === '1'; } catch(e) {}
   const th = S.theme === 'light' || S.theme === 'dark' ? S.theme : 'auto';
   return h('General') +
+    srow('Walkthrough', 'A guided demo that walks through every part of the app. You click and create things as you go. Tasks you make in it are marked so you can delete them at the end.', '<button type="button" class="btn" data-act="tourStart">Start the demo again</button>') +
     (on ? srow('Mailbox delay', 'How long a task planned after the pack is open takes to arrive.', ssel('s-fxfast', 'fxFast', [['0', '1 minute'], ['1', '5 seconds (demo)']], fast ? '1' : '0', 'Mailbox delay')) : '') +
     srow('Theme', '', '<span class="segi" role="group" aria-label="Theme">' + [['auto', SIC.mon, 'Match device'], ['light', SIC.sun, 'Light'], ['dark', SIC.moon, 'Dark']].map(o => '<button type="button" data-act="setTheme" data-v="' + o[0] + '" aria-pressed="' + (th === o[0]) + '" aria-label="' + o[2] + '" title="' + o[2] + '">' + o[1] + '</button>').join('') + '</span>') +
     srow('Week view', '', ssel('s-week', 'weekMode', [['work', 'Workdays (Mon to Fri)'], ['full', 'Full week (Mon to Sun)']], S.settings.fullWeek ? 'full' : 'work', 'Week view')) +
@@ -4486,8 +4511,8 @@ views.settings = function(){
   if (!flat.some(x => x[0] === ui.setTab)) ui.setTab = 'general';
   let under = '';
   try { const pv = views[ui.prevView && ui.prevView !== 'settings' ? ui.prevView : 'today']; if (pv) under = '<div class="setunder" inert aria-hidden="true">' + pv() + '</div>'; } catch(e) { under = ''; }
-  return under + '<div class="setov"><div class="setscrim" data-act="setClose"></div><div class="setpanel" role="dialog" aria-modal="true" aria-label="Settings">' +
-    '<div class="sethd"><h2>Settings</h2><button type="button" class="setx" data-act="setClose" aria-label="Close settings"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>' +
+  return under + '<div class="setov"><div class="setscrim" data-act="setClose"></div><div class="setpanel' + (ui.setNavOff ? ' navoff' : '') + '" role="dialog" aria-modal="true" aria-label="Settings">' +
+    '<div class="sethd"><div class="sethl"><button type="button" class="setcol" data-act="setNavTog" aria-expanded="' + !ui.setNavOff + '" aria-label="' + (ui.setNavOff ? 'Show side panel' : 'Hide side panel') + '"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button><h2>Settings</h2></div><button type="button" class="setx" data-act="setClose" aria-label="Close settings"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>' +
     '<div class="setbd"><nav class="setnav" aria-label="Settings sections"><label class="setsearch"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg><input id="set-q" data-inp="setSearch" placeholder="Search" autocomplete="off" aria-label="Search settings"></label>' +
     nav.map(g => '<div class="setgrp">' + g[0] + '</div>' + g[1].map(x => '<button type="button" class="setit' + (x[0] === 'team' ? ' shiny' : '') + '" data-act="setTab" data-tab="' + x[0] + '" data-kw="' + esc((x[1] + ' ' + x[3]).toLowerCase()) + '"' + (x[0] === 'team' ? ' title="Only for Team Leads"' : '') + (ui.setTab === x[0] ? ' aria-current="true"' : '') + '>' + x[2] + '<span>' + x[1] + '</span></button>').join('')).join('') +
     '<button type="button" class="setme" data-act="openProfile"><span class="setav" aria-hidden="true">' + esc(String((me() || {}).name || '?').charAt(0).toUpperCase()) + '</span><span class="setmt"><b>' + esc((me() || {}).name || '') + '</b><i>Your details</i></span></button></nav><div class="setpane" id="setpane">' + setPane(ui.setTab) + '</div></div></div></div>';
@@ -4509,6 +4534,12 @@ Object.assign(forms, {
 });
 Object.assign(acts, {
   setTab: function(b){ ui.setTab = b.dataset.tab; render(); },
+  colTier: function(b){ ui.colTier = b.dataset.tier || ''; render(); },
+  setNavTog: function(){
+    ui.setNavOff = !ui.setNavOff; try { localStorage.setItem('set-nav-off', ui.setNavOff ? '1' : '0'); } catch(e) {}
+    const pn = document.querySelector('.setpanel'); if (pn) pn.classList.toggle('navoff', ui.setNavOff);
+    const bt = document.querySelector('.setcol'); if (bt) { bt.setAttribute('aria-expanded', String(!ui.setNavOff)); bt.setAttribute('aria-label', ui.setNavOff ? 'Show side panel' : 'Hide side panel'); }
+  },
   setClose: function(){ S.view = ui.prevView && ui.prevView !== 'settings' && views[ui.prevView] ? ui.prevView : 'today'; save(); render(); },
   setTheme: function(b){ S.theme = b.dataset.v; save(); applyTheme(); render(); }
 });
@@ -5661,6 +5692,7 @@ async function enterCloud(){
   return true;
 }
 /* ---------- Role pop-up, walkthrough and removing members (build 1.1.0) ---------- */
+try { ui.setNavOff = localStorage.getItem('set-nav-off') === '1'; } catch(e) {}
 const SKIP_INTRO = (function(){ try { return localStorage.getItem('st-skip-intro') === '1'; } catch(e) { return false; } })();
 const roleKey = () => (me() && isLead()) ? 'lead' : 'member';
 const ROLE_COPY = {
